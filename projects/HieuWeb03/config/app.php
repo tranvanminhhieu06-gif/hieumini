@@ -8,8 +8,19 @@ if (session_status() === PHP_SESSION_NONE) {
 // Base URL definition
 if (!defined('SITE_NAME')) define('SITE_NAME', 'HieuMini');
 if (!defined('SITE_TAGLINE')) define('SITE_TAGLINE', 'Thiên Đường Đồ Dùng Học Tập & Sáng Tạo');
-if (!defined('SITE_URL')) define('SITE_URL', 'http://localhost:8000');
 if (!defined('CURRENCY_SYMBOL')) define('CURRENCY_SYMBOL', 'đ');
+
+// BASE_URL: root-relative (tương thích localhost & Render HTTPS)
+if (!defined('BASE_URL')) {
+    $__docRoot = str_replace('\\', '/', rtrim((string)($_SERVER['DOCUMENT_ROOT'] ?? ''), '/'));
+    $__projectDir = str_replace('\\', '/', dirname(__DIR__)); // config/ -> project root
+    $__basePath = ($__docRoot !== '' && str_starts_with($__projectDir, $__docRoot))
+        ? substr($__projectDir, strlen($__docRoot))
+        : '';
+    define('BASE_URL', rtrim($__basePath, '/'));
+    unset($__docRoot, $__projectDir, $__basePath);
+}
+if (!defined('SITE_URL')) define('SITE_URL', BASE_URL);
 
 // Include Database connection
 require_once __DIR__ . '/db.php';

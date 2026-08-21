@@ -12,12 +12,14 @@ if (!defined('DB_USER')) define('DB_USER', getenv('DB_USER') ?: 'root');
 if (!defined('DB_PASS')) define('DB_PASS', getenv('DB_PASS') !== false ? getenv('DB_PASS') : '');
 if (!defined('DB_CHARSET')) define('DB_CHARSET', 'utf8mb4');
 
-// URL gốc của ứng dụng (Tự động nhận diện hoặc chỉ định)
-$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
-$host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
-$scriptDir = isset($_SERVER['SCRIPT_NAME']) ? dirname($_SERVER['SCRIPT_NAME']) : '';
-$base_url = rtrim($protocol . "://" . $host . str_replace('/admin', '', $scriptDir), '/');
-if (!defined('BASE_URL')) define('BASE_URL', $base_url);
+// BASE_URL: root-relative (tương thích localhost & Render HTTPS)
+$__docRoot = str_replace('\\', '/', rtrim((string)($_SERVER['DOCUMENT_ROOT'] ?? ''), '/'));
+$__projectDir = str_replace('\\', '/', dirname(__DIR__)); // config/ -> bước lên -> project root
+$__basePath = ($__docRoot !== '' && str_starts_with($__projectDir, $__docRoot))
+    ? substr($__projectDir, strlen($__docRoot))
+    : '';
+if (!defined('BASE_URL')) define('BASE_URL', rtrim($__basePath, '/'));
+unset($__docRoot, $__projectDir, $__basePath);
 if (!defined('SITE_NAME')) define('SITE_NAME', 'HieuMini - Siêu Thị Công Nghệ Đỉnh Cao');
 
 class Database {

@@ -14,8 +14,21 @@ if (!defined('DB_PASS')) define('DB_PASS', getenv('DB_PASS') !== false ? getenv(
 if (!defined('DB_CHARSET')) define('DB_CHARSET', 'utf8mb4');
 
 if (!defined('SITE_NAME')) define('SITE_NAME', 'HieuMini - Fashion Studio');
-if (!defined('SITE_URL')) define('SITE_URL', 'http://localhost/HieuWeb01');
 if (!defined('CURRENCY_SYMBOL')) define('CURRENCY_SYMBOL', '₫');
+
+// BASE_URL: root-relative (tương thích localhost & Render HTTPS)
+if (!defined('BASE_URL')) {
+    $__docRoot = str_replace('\\', '/', rtrim((string)($_SERVER['DOCUMENT_ROOT'] ?? ''), '/'));
+    $__baseDir = str_replace('\\', '/', __DIR__);
+    // config/ nằm trong project, bước lên 1 cấp là thư mục project
+    $__projectDir = dirname($__baseDir);
+    $__basePath = ($__docRoot !== '' && str_starts_with($__projectDir, $__docRoot))
+        ? substr($__projectDir, strlen($__docRoot))
+        : '';
+    define('BASE_URL', rtrim($__basePath, '/'));
+    unset($__docRoot, $__baseDir, $__projectDir, $__basePath);
+}
+if (!defined('SITE_URL')) define('SITE_URL', BASE_URL);
 
 try {
     $options = [
