@@ -4,7 +4,7 @@
 # =====================================================================
 
 # ---------- Trang lỗi tuỳ chỉnh ----------
-ErrorDocument 404 /DoAnWebsite/projects/HieuMini/404.php
+ErrorDocument 404 404.php
 
 # ---------- Bảo vệ tệp nhạy cảm ----------
 <FilesMatch "\.(sql|md|py|log|ini)$">
@@ -25,13 +25,13 @@ Options -Indexes
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # /du-an/<slug>  ->  project-detail.php?slug=<slug>
+  # /du-an/<slug>  ->  project-detail.php?slug=$1
   RewriteRule ^du-an/([a-z0-9-]+)/?$ project-detail.php?slug=$1 [L,QSA]
 
-  # /danh-muc/<slug>  ->  projects.php?cat=<slug>
+  # /danh-muc/<slug>  ->  projects.php?cat=$1
   RewriteRule ^danh-muc/([a-z0-9-]+)/?$ projects.php?cat=$1 [L,QSA]
 
-  # /bai-viet/<slug>  ->  blog-detail.php?slug=<slug>
+  # /bai-viet/<slug>  ->  blog-detail.php?slug=$1
   RewriteRule ^bai-viet/([a-z0-9-]+)/?$ blog-detail.php?slug=$1 [L,QSA]
 
   # sitemap.xml -> sitemap.php
@@ -59,7 +59,6 @@ Options -Indexes
 # ---------- Tiêu đề bảo mật ----------
 <IfModule mod_headers.c>
   Header set X-Content-Type-Options "nosniff"
-  Header set X-Frame-Options "SAMEORIGIN"
   Header set Referrer-Policy "strict-origin-when-cross-origin"
   Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
 </IfModule>

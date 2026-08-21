@@ -176,7 +176,7 @@ $heroGradientFrom = 5; // Từ "khám" trở đi tô màu gradient
             <span class="live-dot"><i></i> <?= $exists ? 'Live' : 'Offline' ?></span>
 
             <?php if ($exists): ?>
-              <iframe title="Xem trước <?= e($p['name']) ?>" loading="lazy" tabindex="-1"></iframe>
+              <iframe src="<?= e(project_url($p, $p['entry_file'])) ?>" title="Xem trước <?= e($p['name']) ?>" loading="lazy" tabindex="-1"></iframe>
               <div class="frame-skeleton">
                 <span class="frame-spinner"></span>
                 Đang nạp <?= e($p['code']) ?>…

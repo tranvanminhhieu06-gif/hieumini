@@ -295,10 +295,10 @@
    |    cùng tải một lúc làm chậm trang chủ.
    * ----------------------------------------------------------------- */
   function initLiveFrames() {
-    var frames = Array.prototype.slice.call(document.querySelectorAll('[data-live-src]'));
+    var frames = Array.prototype.slice.call(document.querySelectorAll('.live-frame[data-live-src]'));
     if (!frames.length) return;
 
-    var ERR_RE = /kết nối được cơ sở dữ liệu|SQLSTATE|Fatal error|Connection refused|Uncaught PDOException|Unknown database/i;
+    var ERR_RE = /SQLSTATE\[|Fatal error:|Uncaught PDOException|Unknown database 'hieu/i;
 
     function inspect(wrap, iframe) {
       try {
@@ -311,11 +311,10 @@
         if (href === 'about:blank' || href === '') return;
 
         var text = (doc.body.innerText || '').trim();
-        var html = doc.body.innerHTML || '';
         var fb = wrap.querySelector('.frame-fallback');
 
-        // Chỉ coi là lỗi nếu có chuỗi lỗi CSDL/PHP hoặc nội dung body hoàn toàn rỗng
-        if ((text.length < 500 && ERR_RE.test(text)) || (text.length === 0 && html.length < 50)) {
+        // Chỉ coi là lỗi nếu xuất hiện chuỗi lỗi SQL/PHP chết người
+        if (text.length < 400 && ERR_RE.test(text)) {
           wrap.classList.add('is-fallback');
           if (fb) fb.hidden = false;
         } else {
@@ -323,43 +322,39 @@
           if (fb) fb.hidden = true;
         }
       } catch (e) {
-        // Khác nguồn hoặc không truy cập được: giữ nguyên khung xem trực tiếp
+        // Khác nguồn hoặc không truy cập được: luôn giữ nguyên khung live
         wrap.classList.remove('is-fallback');
         var fb_err = wrap.querySelector('.frame-fallback');
         if (fb_err) fb_err.hidden = true;
       }
     }
 
-    function load(wrap) {
+    frames.forEach(function (wrap) {
       var iframe = wrap.querySelector('iframe');
-      if (!iframe || iframe.src) return;
+      if (!iframe) return;
 
       var targetSrc = wrap.getAttribute('data-live-src');
-      if (!targetSrc) return;
+      if (targetSrc && !iframe.src) {
+        iframe.src = targetSrc;
+      }
 
-      iframe.addEventListener('load', function () {
+      function onReady() {
         wrap.classList.add('is-ready');
         setTimeout(function () {
           inspect(wrap, iframe);
-        }, 150);
-      });
+        }, 200);
+      }
 
-      // Gỡ lớp chờ sau tối đa 6 giây
-      setTimeout(function () { wrap.classList.add('is-ready'); }, 6000);
-      iframe.src = targetSrc;
-    }
+      iframe.addEventListener('load', onReady);
+      if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete' && iframe.src) {
+        onReady();
+      }
 
-    if (!('IntersectionObserver' in window)) { frames.forEach(load); return; }
-
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        io.unobserve(entry.target);
-        load(entry.target);
-      });
-    }, { rootMargin: '400px 0px' });
-
-    frames.forEach(function (el) { io.observe(el); });
+      // Đảm bảo gỡ spinner sau tối đa 3.5 giây để luôn hiện website live
+      setTimeout(function () {
+        wrap.classList.add('is-ready');
+      }, 3500);
+    });
   }
 
   /* -----------------------------------------------------------------
@@ -401,7 +396,7 @@
     var fallback = document.querySelector('[data-stage-fallback]');
     if (!iframe || !fallback) return;
 
-    var ERR_RE = /kết nối được cơ sở dữ liệu|SQLSTATE|Fatal error|Connection refused|Uncaught PDOException|Unknown database/i;
+    var ERR_RE = /SQLSTATE\[|Fatal error:|Uncaught PDOException|Unknown database 'hieu/i;
 
     function check() {
       try {
@@ -414,10 +409,9 @@
         if (href === 'about:blank' || href === '') return;
 
         var text = (doc.body.innerText || '').trim();
-        var html = doc.body.innerHTML || '';
 
-        // Chỉ hiện cảnh báo khi có chuỗi lỗi CSDL/PHP hoặc thân trang hoàn toàn rỗng sau khi tải
-        if ((text.length < 500 && ERR_RE.test(text)) || (text.length === 0 && html.length < 50)) {
+        // Chỉ hiện cảnh báo khi có chuỗi lỗi CSDL/PHP chết người
+        if (text.length < 400 && ERR_RE.test(text)) {
           fallback.hidden = false;
           iframe.style.visibility = 'hidden';
         } else {
@@ -432,14 +426,14 @@
     }
 
     iframe.addEventListener('load', function () {
-      setTimeout(check, 150);
+      setTimeout(check, 200);
     });
 
     try {
       if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
         var curHref = iframe.contentDocument.location ? iframe.contentDocument.location.href : '';
         if (curHref && curHref !== 'about:blank') {
-          setTimeout(check, 150);
+          setTimeout(check, 200);
         }
       }
     } catch (e) {}
