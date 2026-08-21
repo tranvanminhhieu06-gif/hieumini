@@ -43,6 +43,6 @@
 
 <button type="button" class="to-top" aria-label="Cuộn lên đầu trang"><?= icon('arrow') ?></button>
 
-<script src="<?= e(asset('js/main.js')) ?>" defer></script>
+<script src="<?= e(asset('js/main.js')) ?>?v=<?= filemtime(__DIR__ . '/../assets/js/main.js') ?: '2' ?>" defer></script>
 </body>
 </html>
