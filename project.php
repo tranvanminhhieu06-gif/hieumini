@@ -49,6 +49,7 @@ $others = Database::all(
 $exists  = project_exists($project);
 $liveUrl = project_url($project, $project['entry_file']);
 $adminUrl = project_url($project, $project['admin_path']);
+$totalProjects = (int) Database::scalar("SELECT COUNT(*) FROM projects WHERE status = 'published'");
 
 $pageTitle = $project['name'] . ' — ' . SITE_NAME;
 $pageDesc  = $project['tagline'];
@@ -75,8 +76,8 @@ require __DIR__ . '/includes/header.php';
         <a class="btn btn--primary" href="<?= e($liveUrl) ?>" target="_blank" rel="noopener">
           <?= icon('external', 'ico ico-sm') ?> Mở toàn màn hình
         </a>
-        <a class="btn btn--ghost" href="<?= e(url('open-admin.php?slug=' . rawurlencode($project['slug']))) ?>">
-          <?= icon('lock', 'ico ico-sm') ?> Xem quản trị trực tiếp
+        <a class="btn btn--ghost" href="<?= e($adminUrl) ?>" target="_blank" rel="noopener">
+          <?= icon('lock', 'ico ico-sm') ?> Trang quản trị dự án
         </a>
       <?php else: ?>
         <span class="alert alert--error" style="margin:0">
@@ -85,6 +86,26 @@ require __DIR__ . '/includes/header.php';
         </span>
       <?php endif; ?>
     </div>
+
+    <?php if ($exists): ?>
+    <div class="cred-card" role="note">
+      <span class="cred-ico"><?= icon('lock') ?></span>
+      <div class="cred-body">
+        <b>Tài khoản quản trị demo — dùng chung cho cả <?= (int) $totalProjects ?> dự án</b>
+        <div class="cred-rows">
+          <span class="cred-item">Email <code><?= e(DEMO_ADMIN_USER) ?></code>
+            <button type="button" class="cred-copy" data-copy="<?= e(DEMO_ADMIN_USER) ?>" aria-label="Sao chép email">
+              <?= icon('external', 'ico ico-sm') ?></button>
+          </span>
+          <span class="cred-item">Mật khẩu <code><?= e(DEMO_ADMIN_PASS) ?></code>
+            <button type="button" class="cred-copy" data-copy="<?= e(DEMO_ADMIN_PASS) ?>" aria-label="Sao chép mật khẩu">
+              <?= icon('external', 'ico ico-sm') ?></button>
+          </span>
+        </div>
+        <span class="cred-hint">Bấm “Trang quản trị dự án” rồi đăng nhập bằng tài khoản trên.</span>
+      </div>
+    </div>
+    <?php endif; ?>
   </div>
 </section>
 

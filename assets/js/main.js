@@ -410,6 +410,39 @@
     });
   }
 
+  /* -----------------------------------------------------------------
+   | 14. SAO CHÉP TÀI KHOẢN DEMO
+   * ----------------------------------------------------------------- */
+  function initCopy() {
+    document.addEventListener('click', function (ev) {
+      var btn = ev.target.closest('[data-copy]');
+      if (!btn) return;
+      var text = btn.getAttribute('data-copy');
+
+      var done = function () {
+        btn.classList.add('is-copied');
+        setTimeout(function () { btn.classList.remove('is-copied'); }, 1400);
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () { fallback(text, done); });
+      } else {
+        fallback(text, done);
+      }
+    });
+
+    function fallback(text, done) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) {}
+      ta.remove();
+    }
+  }
+
   /* ----------------------------------------------------------------- */
   function boot() {
     initTheme();
@@ -425,6 +458,7 @@
     initViewportSwitch();
     initPageTransition();
     initToasts();
+    initCopy();
   }
 
   if (document.readyState === 'loading') {

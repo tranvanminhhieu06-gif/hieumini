@@ -163,38 +163,44 @@ Lần build đầu mất khoảng 4–6 phút. Xong sẽ có địa chỉ dạng
 
 ---
 
-## Xem quản trị trực tiếp không cần mật khẩu
+## Tài khoản quản trị dùng chung cho cả 6 dự án con
 
-Trên trang chi tiết mỗi dự án có nút **"Xem quản trị trực tiếp"**. Bấm vào,
-HieuMini tự đăng nhập vào trang quản trị của dự án con đó và hiển thị ngay —
-người xem không phải gõ mật khẩu.
+Trên trang chi tiết mỗi dự án có nút **"Trang quản trị dự án"** và một thẻ hiển
+thị **tài khoản quản trị demo dùng chung cho cả sáu dự án**:
 
-Cơ chế: HieuMini nạp chính biểu mẫu đăng nhập thật của dự án con trong một
-khung cùng nguồn, tự điền tài khoản demo rồi bấm đăng nhập giúp. Vì dùng biểu
-mẫu thật nên mọi cơ chế riêng của từng dự án (token CSRF, cấu trúc phiên) đều
-được tôn trọng.
+| | |
+|---|---|
+| **Email** | `admin@hieumini.vn` |
+| **Mật khẩu** | `demo123` |
 
-Tài khoản demo dùng chung cho cả 6 dự án con là **mật khẩu `demo123`**. Tệp
-`database/tidb_all.sql` đã tự đặt lại mật khẩu này cho tài khoản quản trị của
-cả 6 dự án, nên trên Render tính năng chạy được ngay sau khi nạp CSDL.
+Người xem bấm nút, đăng nhập bằng tài khoản trên là vào được trang quản trị của
+bất kỳ dự án nào — không phải nhớ sáu tài khoản khác nhau.
 
-> **Nếu muốn tính năng này chạy cả trên localhost:** mỗi dự án con trên máy bạn
-> dùng CSDL riêng với mật khẩu gốc, nên cần đặt lại mật khẩu về `demo123`. Mở
-> phpMyAdmin, chọn tab **SQL** và chạy:
+Tệp `database/tidb_all.sql` đã tự đặt **cùng một email và mật khẩu** cho tài
+khoản quản trị của cả sáu dự án (khối `UPDATE ... WHERE role='admin'` ở cuối
+tệp), nên trên Render tài khoản chung chạy được ngay sau khi nạp CSDL.
+
+> **Nếu muốn dùng cả trên localhost:** mỗi dự án con trên máy bạn dùng CSDL riêng
+> với tài khoản gốc, nên cần đặt lại email và mật khẩu. Mở phpMyAdmin → tab
+> **SQL** và chạy:
 >
 > ```sql
 > SET @h = '$2y$12$VNWuZfLGEhoGn5l3eGTx2unsvMwipSFRc..lz0bUmXQwT0i1jR6yS';
-> UPDATE hieumini_db.users            SET password=@h WHERE role='admin';
-> UPDATE hieumini_bookstore_db.users  SET password=@h WHERE role='admin';
-> UPDATE hieumini_furniture_db.users  SET password=@h WHERE role='admin';
-> UPDATE datcyber_appliances_db.users SET password=@h WHERE role='admin';
-> UPDATE hieumini_gym_db.users        SET password=@h WHERE role='admin';
-> UPDATE hieumini_market_db.users     SET password=@h WHERE role='admin';
+> UPDATE hieumini_db.users            SET email='admin@hieumini.vn', password=@h WHERE role='admin';
+> UPDATE hieumini_bookstore_db.users  SET email='admin@hieumini.vn', password=@h WHERE role='admin';
+> UPDATE hieumini_furniture_db.users  SET email='admin@hieumini.vn', password=@h WHERE role='admin';
+> UPDATE datcyber_appliances_db.users SET email='admin@hieumini.vn', password=@h WHERE role='admin';
+> UPDATE hieumini_gym_db.users        SET email='admin@hieumini.vn', password=@h WHERE role='admin';
+> UPDATE hieumini_market_db.users     SET email='admin@hieumini.vn', password=@h WHERE role='admin';
 > ```
 >
-> **Muốn tắt tính năng đăng nhập tự động:** mở `open-admin.php` và xóa nó đi,
-> hoặc trong `includes/functions.php` cho hàm `project_admin_demo()` luôn trả về
-> `null`. Khi đó nút sẽ mở thẳng trang đăng nhập bình thường.
+> **Muốn đổi tài khoản demo hiển thị trên trang:** sửa hai hằng số
+> `DEMO_ADMIN_USER` và `DEMO_ADMIN_PASS` trong `config/config.php` (hoặc đặt biến
+> môi trường cùng tên trên Render), rồi cập nhật lại email/mật khẩu trong CSDL
+> cho khớp.
+
+> Tệp `open-admin.php` (chức năng tự đăng nhập cũ) đã ngừng dùng, nay chỉ chuyển
+> hướng về trang dự án. Có thể xóa an toàn.
 
 ---
 

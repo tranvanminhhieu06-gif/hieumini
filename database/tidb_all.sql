@@ -1649,16 +1649,19 @@ SET FOREIGN_KEY_CHECKS = 0;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ==========================================================================
---  ĐẶT LẠI MẬT KHẨU QUẢN TRỊ 6 DỰ ÁN CON VỀ "demo123"
---  Phục vụ nút xem quản trị trực tiếp (chế độ trưng bày) trên HieuMini.
---  Muốn tắt tính năng này: bỏ khối UPDATE bên dưới trước khi nạp.
+--  TÀI KHOẢN QUẢN TRỊ DEMO DÙNG CHUNG CHO CẢ 6 DỰ ÁN CON
+--    Email    : admin@hieumini.vn
+--    Mật khẩu : demo123
+--  Đặt cùng một email và mật khẩu cho tài khoản quản trị của cả sáu
+--  dự án, để một tài khoản duy nhất đăng nhập được vào mọi trang quản trị.
+--  Muốn dùng tài khoản gốc của từng dự án: bỏ khối UPDATE bên dưới.
 -- ==========================================================================
-UPDATE `hieumini_db`.`users`            SET `password` = '$2y$12$VNWuZfLGEhoGn5l3eGTx2unsvMwipSFRc..lz0bUmXQwT0i1jR6yS' WHERE `role` = 'admin';
-UPDATE `hieumini_bookstore_db`.`users`  SET `password` = '$2y$12$VNWuZfLGEhoGn5l3eGTx2unsvMwipSFRc..lz0bUmXQwT0i1jR6yS' WHERE `role` = 'admin';
-UPDATE `hieumini_furniture_db`.`users`  SET `password` = '$2y$12$VNWuZfLGEhoGn5l3eGTx2unsvMwipSFRc..lz0bUmXQwT0i1jR6yS' WHERE `role` = 'admin';
-UPDATE `datcyber_appliances_db`.`users` SET `password` = '$2y$12$VNWuZfLGEhoGn5l3eGTx2unsvMwipSFRc..lz0bUmXQwT0i1jR6yS' WHERE `role` = 'admin';
-UPDATE `hieumini_gym_db`.`users`        SET `password` = '$2y$12$VNWuZfLGEhoGn5l3eGTx2unsvMwipSFRc..lz0bUmXQwT0i1jR6yS' WHERE `role` = 'admin';
-UPDATE `hieumini_market_db`.`users`     SET `password` = '$2y$12$VNWuZfLGEhoGn5l3eGTx2unsvMwipSFRc..lz0bUmXQwT0i1jR6yS' WHERE `role` = 'admin';
+UPDATE `hieumini_db`.`users` SET `email` = 'admin@hieumini.vn', `password` = '$2y$12$VNWuZfLGEhoGn5l3eGTx2unsvMwipSFRc..lz0bUmXQwT0i1jR6yS' WHERE `role` = 'admin';
+UPDATE `hieumini_bookstore_db`.`users` SET `email` = 'admin@hieumini.vn', `password` = '$2y$12$VNWuZfLGEhoGn5l3eGTx2unsvMwipSFRc..lz0bUmXQwT0i1jR6yS' WHERE `role` = 'admin';
+UPDATE `hieumini_furniture_db`.`users` SET `email` = 'admin@hieumini.vn', `password` = '$2y$12$VNWuZfLGEhoGn5l3eGTx2unsvMwipSFRc..lz0bUmXQwT0i1jR6yS' WHERE `role` = 'admin';
+UPDATE `datcyber_appliances_db`.`users` SET `email` = 'admin@hieumini.vn', `password` = '$2y$12$VNWuZfLGEhoGn5l3eGTx2unsvMwipSFRc..lz0bUmXQwT0i1jR6yS' WHERE `role` = 'admin';
+UPDATE `hieumini_gym_db`.`users` SET `email` = 'admin@hieumini.vn', `password` = '$2y$12$VNWuZfLGEhoGn5l3eGTx2unsvMwipSFRc..lz0bUmXQwT0i1jR6yS' WHERE `role` = 'admin';
+UPDATE `hieumini_market_db`.`users` SET `email` = 'admin@hieumini.vn', `password` = '$2y$12$VNWuZfLGEhoGn5l3eGTx2unsvMwipSFRc..lz0bUmXQwT0i1jR6yS' WHERE `role` = 'admin';
 
 -- ==========================================================================
 --  KIỂM TRA SAU KHI IMPORT — chạy lệnh dưới đây, phải thấy đủ 7 dòng:

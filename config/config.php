@@ -37,6 +37,15 @@ define('SITE_AUTHOR',  'Trần Văn Minh Hiếu');
 define('SITE_EMAIL',   'tranvanminhhieu06@gmail.com');
 
 /* -----------------------------------------------------------------
+ | Tài khoản quản trị demo dùng chung cho cả 6 dự án con
+ | Được hiển thị trên trang chi tiết để người xem tự đăng nhập.
+ | Kịch bản database/tidb_all.sql đã đặt email và mật khẩu này cho
+ | tài khoản quản trị của cả sáu dự án.
+ * ----------------------------------------------------------------- */
+define('DEMO_ADMIN_USER', env_value('DEMO_ADMIN_USER', 'admin@hieumini.vn'));
+define('DEMO_ADMIN_PASS', env_value('DEMO_ADMIN_PASS', 'demo123'));
+
+/* -----------------------------------------------------------------
  | Kết nối cơ sở dữ liệu
  | Có thể ghi đè bằng biến môi trường khi triển khai máy chủ thật.
  * ----------------------------------------------------------------- */

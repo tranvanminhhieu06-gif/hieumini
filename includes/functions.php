@@ -101,33 +101,6 @@ function project_url(array $project, string $suffix = ''): string
     return url('projects/' . rawurlencode($project['folder']) . '/' . ltrim($suffix, '/'));
 }
 
-/**
- * Cấu hình đăng nhập quản trị "chế độ trưng bày" cho từng dự án con.
- * Sáu dự án dùng biểu mẫu đăng nhập khác nhau (email + mật khẩu), đường dẫn
- * đăng nhập khác nhau, và HieuWeb06 còn yêu cầu token CSRF. Bảng dưới đây chỉ
- * lưu ba thứ tối thiểu: đường dẫn biểu mẫu, email quản trị và mật khẩu demo.
- * Cầu nối open-admin.php sẽ tự điền và gửi chính biểu mẫu thật của dự án đó,
- * nhờ vậy không cần biết cấu trúc phiên hay xử lý CSRF của từng dự án.
- *
- * Trả về null nếu dự án không nằm trong danh sách hỗ trợ đăng nhập tự động.
- */
-function project_admin_demo(string $code): ?array
-{
-    static $map = [
-        'HieuWeb01' => ['login' => 'admin/login.php', 'email' => 'admin@hieumini.vn'],
-        'HieuWeb02' => ['login' => 'login.php',       'email' => 'admin@hieumini.vn'],
-        'HieuWeb03' => ['login' => 'login.php',       'email' => 'admin@hieumini.vn'],
-        'HieuWeb04' => ['login' => 'admin/login.php', 'email' => 'admin@datcyber.vn'],
-        'HieuWeb05' => ['login' => 'admin/login.php', 'email' => 'admin@hieumini.com'],
-        'HieuWeb06' => ['login' => 'admin/login.php', 'email' => 'admin@hieumini.vn'],
-    ];
-
-    if (!isset($map[$code])) {
-        return null;
-    }
-
-    return $map[$code] + ['password' => 'demo123'];
-}
 
 /** Kiểm tra thư mục dự án con có thực sự tồn tại trên đĩa hay không. */
 function project_exists(array $project): bool
