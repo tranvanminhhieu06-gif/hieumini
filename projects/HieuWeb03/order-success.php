@@ -91,6 +91,21 @@ require_once __DIR__ . '/includes/navbar.php';
       </div>
     </div>
 
+    <!-- VietQR Chuyển Khoản nếu chọn Banking -->
+    <?php if (in_array($order['payment_method'] ?? '', ['banking', 'bank', 'bank_transfer', 'momo'], true)): ?>
+    <div style="background: #f0fdf4; border: 1.5px dashed #22c55e; border-radius: var(--radius-md); padding: 24px; margin-bottom: 30px; text-align: center;">
+      <h4 style="color: #15803d; font-size: 1.1rem; font-weight: 700; margin-bottom: 12px;"><i class="bi bi-qr-code-scan"></i> Quét Mã VietQR Thanh Toán Tự Động 24/7</h4>
+      <div style="display: inline-block; background: #fff; padding: 12px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 14px;">
+        <img src="https://api.vietqr.io/image/970422-888899998888-qr_only.jpg?amount=<?= (int)$order['total_amount'] ?>&addInfo=<?= urlencode($order['order_code']) ?>" alt="VietQR" style="width: 190px; height: 190px; object-fit: contain;">
+      </div>
+      <div style="font-size: 0.9rem; color: #334155; line-height: 1.8;">
+        <div>Ngân hàng: <strong>MB Bank (Ngân hàng Quân Đội)</strong> | STK: <strong style="color: #15803d; font-family: monospace;">888899998888</strong></div>
+        <div>Chủ tài khoản: <strong>HIEUMINI FURNITURE STORE</strong></div>
+        <div>Nội dung CK: <strong style="color: #ef4444; font-family: monospace; font-size: 1rem;"><?= htmlspecialchars($order['order_code']) ?></strong></div>
+      </div>
+    </div>
+    <?php endif; ?>
+
     <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
       <a href="index.php" class="btn btn-primary btn-lg">
         <i class="bi bi-shop"></i> Tiếp Tục Mua Sắm

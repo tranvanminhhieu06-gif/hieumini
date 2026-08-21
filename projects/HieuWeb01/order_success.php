@@ -117,6 +117,21 @@ require_once __DIR__ . '/includes/header.php';
             </div>
         </div>
 
+        <!-- VietQR Chuyển Khoản nếu chọn Banking -->
+        <?php if ($order['payment_method'] === 'banking'): ?>
+        <div style="background: #eff6ff; border: 1.5px dashed #3b82f6; border-radius: var(--radius-md); padding: 20px; margin-bottom: 24px; text-align: center;">
+            <h4 style="color: #1d4ed8; font-size: 1.05rem; margin-bottom: 12px;"><i class="fa-solid fa-qrcode"></i> Quét Mã VietQR Thanh Toán Tự Động</h4>
+            <div style="display: inline-block; background: #fff; padding: 10px; border-radius: 8px; box-shadow: var(--shadow-sm); margin-bottom: 12px;">
+                <img src="https://api.vietqr.io/image/970422-888899998888-qr_only.jpg?amount=<?= (int)$order['total_amount'] ?>&addInfo=<?= urlencode($order['order_code']) ?>" alt="VietQR" style="width: 190px; height: 190px; object-fit: contain;">
+            </div>
+            <div style="font-size: 0.875rem; color: #334155; line-height: 1.6;">
+                <div>Ngân hàng: <strong>MB Bank (Ngân hàng Quân Đội)</strong> | STK: <strong style="color: #2563eb; font-family: monospace;">888899998888</strong></div>
+                <div>Chủ TK: <strong>HIEUMINI FASHION STUDIO</strong></div>
+                <div>Nội dung CK: <strong style="color: #ef4444; font-family: monospace;"><?= htmlspecialchars($order['order_code']) ?></strong></div>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <!-- Nút thao tác -->
         <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
             <a href="index.php" class="btn btn-outline">

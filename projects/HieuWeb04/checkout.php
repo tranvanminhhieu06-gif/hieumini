@@ -37,11 +37,15 @@ $finalTotal = max(0, $subtotal - $discount + $shippingFee);
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
     $name = clean_input($_POST['customer_name'] ?? '');
-    $phone = clean_input($_POST['customer_phone'] ?? '');
+    $rawPhone = $_POST['customer_phone'] ?? '';
+    $phone = preg_replace('/[^\d]/', '', (string)$rawPhone);
     $email = clean_input($_POST['customer_email'] ?? '');
     $address = clean_input($_POST['customer_address'] ?? '');
     $note = clean_input($_POST['customer_note'] ?? '');
     $paymentMethod = clean_input($_POST['payment_method'] ?? 'cod');
+    if (!in_array($paymentMethod, ['cod', 'banking', 'momo'], true)) {
+        $paymentMethod = 'cod';
+    }
 
     if (empty($name) || empty($phone) || empty($address)) {
         $error = 'Vui lòng điền đầy đủ Họ tên, Số điện thoại và Địa chỉ nhận hàng!';
@@ -65,10 +69,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
 
             $orderCode = generate_order_code();
             $userId = $_SESSION['user_id'] ?? null;
+            $saveEmail = !empty($email) ? $email : '';
 
             $stmt = $pdo->prepare("INSERT INTO orders (order_code, user_id, customer_name, customer_email, customer_phone, customer_address, customer_note, payment_method, total_amount, discount_amount, shipping_fee, final_amount, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
             $stmt->execute([
-                $orderCode, $userId, $name, $email, $phone, $address, $note, $paymentMethod,
+                $orderCode, $userId, $name, $saveEmail, $phone, $address, $note, $paymentMethod,
                 $subtotal, $discount, $shippingFee, $finalTotal
             ]);
             $orderId = $pdo->lastInsertId();
@@ -95,7 +100,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
             exit;
 
         } catch (Exception $e) {
-            $pdo->rollBack();
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
             $error = 'Đã có lỗi xảy ra khi tạo đơn hàng: ' . $e->getMessage();
         }
     }
@@ -116,10 +123,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
   <h2 class="fw-bold mb-4"><i class="fas fa-credit-card text-primary me-2"></i> Thông Tin Thanh Toán & Đặt Hàng</h2>
 
   <?php if (!empty($error)): ?>
-    <div class="alert alert-danger shadow-sm"><?php echo htmlspecialchars($error); ?></div>
+    <div class="alert alert-danger shadow-sm d-flex align-items-center gap-2 mb-4">
+      <i class="fas fa-circle-exclamation fs-5"></i>
+      <div><?php echo htmlspecialchars($error); ?></div>
+    </div>
   <?php endif; ?>
 
-  <form action="checkout.php" method="POST">
+  <form action="checkout.php" method="POST" id="checkoutForm">
     <div class="row g-4">
       
       <!-- Customer Information Form -->
@@ -129,28 +139,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
           
           <div class="row g-3">
             <div class="col-md-6">
-              <label class="form-label small fw-semibold">Họ và tên <span class="text-danger">*</span></label>
+              <label class="form-label small fw-semibold">Họ và tên người nhận <span class="text-danger">*</span></label>
               <input type="text" name="customer_name" class="form-control" required placeholder="Nguyễn Văn A" value="<?php echo htmlspecialchars($_POST['customer_name'] ?? ''); ?>">
             </div>
 
             <div class="col-md-6">
-              <label class="form-label small fw-semibold">Số điện thoại <span class="text-danger">*</span></label>
-              <input type="tel" name="customer_phone" class="form-control" required placeholder="0912 345 678" value="<?php echo htmlspecialchars($_POST['customer_phone'] ?? ''); ?>">
+              <label class="form-label small fw-semibold">Số điện thoại liên hệ <span class="text-danger">*</span></label>
+              <input type="tel" name="customer_phone" class="form-control" required placeholder="0912345678" value="<?php echo htmlspecialchars($_POST['customer_phone'] ?? ''); ?>">
+              <div class="form-text small text-muted">VD: 0912345678 (10 số)</div>
             </div>
 
             <div class="col-12">
-              <label class="form-label small fw-semibold">Địa chỉ Email</label>
+              <label class="form-label small fw-semibold">Địa chỉ Email (Nhận thông báo đơn hàng)</label>
               <input type="email" name="customer_email" class="form-control" placeholder="nguyenvana@gmail.com" value="<?php echo htmlspecialchars($_POST['customer_email'] ?? ''); ?>">
             </div>
 
             <div class="col-12">
-              <label class="form-label small fw-semibold">Địa chỉ giao hàng chi tiết <span class="text-danger">*</span></label>
+              <label class="form-label small fw-semibold">Địa chỉ nhận hàng chi tiết <span class="text-danger">*</span></label>
               <input type="text" name="customer_address" class="form-control" required placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố" value="<?php echo htmlspecialchars($_POST['customer_address'] ?? ''); ?>">
             </div>
 
             <div class="col-12">
               <label class="form-label small fw-semibold">Ghi chú giao hàng (Tùy chọn)</label>
-              <textarea name="customer_note" rows="2" class="form-control" placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi đến..."><?php echo htmlspecialchars($_POST['customer_note'] ?? ''); ?></textarea>
+              <textarea name="customer_note" rows="2" class="form-control" placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi giao..."><?php echo htmlspecialchars($_POST['customer_note'] ?? ''); ?></textarea>
             </div>
           </div>
         </div>
@@ -160,32 +171,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
           <h5 class="fw-bold mb-3"><i class="fas fa-wallet text-primary me-2"></i> 2. Phương Thức Thanh Toán</h5>
 
           <div class="d-flex flex-column gap-3">
-            <label class="p-3 border rounded-3 d-flex align-items-center gap-3 cursor-pointer bg-light">
-              <input type="radio" name="payment_method" value="cod" checked class="form-check-input mt-0">
-              <i class="fas fa-hand-holding-dollar text-success fs-4"></i>
-              <div>
-                <div class="fw-bold">Thanh toán khi nhận hàng (COD)</div>
-                <small class="text-muted">Kiểm tra sản phẩm và thanh toán tiền mặt trực tiếp cho shipper</small>
+            
+            <!-- COD Option -->
+            <label class="p-3 border rounded-3 d-flex align-items-start gap-3 cursor-pointer payment-option-card active" style="transition: all 0.2s ease;">
+              <input type="radio" name="payment_method" value="cod" <?php echo (!isset($_POST['payment_method']) || $_POST['payment_method'] === 'cod') ? 'checked' : ''; ?> class="form-check-input mt-1 payment-radio">
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <div class="fw-bold d-flex align-items-center gap-2">
+                    <i class="fas fa-hand-holding-dollar text-success fs-5"></i>
+                    <span>Thanh toán khi nhận hàng (COD)</span>
+                  </div>
+                  <span class="badge bg-success bg-opacity-10 text-success">Phổ biến</span>
+                </div>
+                <small class="text-muted d-block">Kiểm tra sản phẩm và thanh toán tiền mặt trực tiếp cho nhân viên giao hàng khi nhận máy.</small>
               </div>
             </label>
 
-            <label class="p-3 border rounded-3 d-flex align-items-center gap-3 cursor-pointer">
-              <input type="radio" name="payment_method" value="banking" class="form-check-input mt-0">
-              <i class="fas fa-qrcode text-primary fs-4"></i>
-              <div>
-                <div class="fw-bold">Chuyển khoản Ngân hàng / Quét mã VietQR</div>
-                <small class="text-muted">Chuyển khoản tự động qua hệ thống mã QR Napas 24/7</small>
+            <!-- VietQR Banking Option -->
+            <label class="p-3 border rounded-3 d-flex align-items-start gap-3 cursor-pointer payment-option-card" style="transition: all 0.2s ease;">
+              <input type="radio" name="payment_method" value="banking" <?php echo (isset($_POST['payment_method']) && $_POST['payment_method'] === 'banking') ? 'checked' : ''; ?> class="form-check-input mt-1 payment-radio">
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <div class="fw-bold d-flex align-items-center gap-2">
+                    <i class="fas fa-qrcode text-primary fs-5"></i>
+                    <span>Chuyển khoản Ngân hàng / Quét mã VietQR (Tự động 24/7)</span>
+                  </div>
+                  <span class="badge bg-primary bg-opacity-10 text-primary">Nhanh chóng</span>
+                </div>
+                <small class="text-muted d-block mb-2">Hỗ trợ tất cả ứng dụng ngân hàng: MBBank, Vietcombank, Techcombank, VPBank, ACB, BIDV...</small>
+                
+                <div class="banking-info-preview p-2 bg-light rounded-2 border small" style="display: none;">
+                  <div class="d-flex justify-content-between">
+                    <span class="text-muted">Ngân hàng thụ hưởng:</span>
+                    <strong>MB Bank (Ngân hàng Quân Đội)</strong>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <span class="text-muted">Số tài khoản:</span>
+                    <strong class="text-primary font-monospace">888899998888</strong>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <span class="text-muted">Chủ tài khoản:</span>
+                    <strong>DATCYBER VIETNAM</strong>
+                  </div>
+                  <div class="text-info mt-1" style="font-size: 0.8rem;">
+                    <i class="fas fa-info-circle me-1"></i> Mã QR kèm nội dung chuyển khoản chuẩn xác sẽ hiển thị ngay sau khi xác nhận đặt hàng.
+                  </div>
+                </div>
               </div>
             </label>
 
-            <label class="p-3 border rounded-3 d-flex align-items-center gap-3 cursor-pointer">
-              <input type="radio" name="payment_method" value="momo" class="form-check-input mt-0">
-              <i class="fas fa-mobile-screen-button text-danger fs-4"></i>
-              <div>
-                <div class="fw-bold">Ví MoMo / VNPay SmartPay</div>
-                <small class="text-muted">Thanh toán nhanh chóng và bảo mật qua cổng ví điện tử</small>
+            <!-- MoMo / VNPay Option -->
+            <label class="p-3 border rounded-3 d-flex align-items-start gap-3 cursor-pointer payment-option-card" style="transition: all 0.2s ease;">
+              <input type="radio" name="payment_method" value="momo" <?php echo (isset($_POST['payment_method']) && $_POST['payment_method'] === 'momo') ? 'checked' : ''; ?> class="form-check-input mt-1 payment-radio">
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <div class="fw-bold d-flex align-items-center gap-2">
+                    <i class="fas fa-mobile-screen-button text-danger fs-5"></i>
+                    <span>Ví Điện Tử MoMo / VNPay SmartPay</span>
+                  </div>
+                  <span class="badge bg-danger bg-opacity-10 text-danger">Tiện lợi</span>
+                </div>
+                <small class="text-muted d-block">Quét mã thanh toán qua App MoMo hoặc ứng dụng ngân hàng hỗ trợ VNPay-QR.</small>
               </div>
             </label>
+
           </div>
         </div>
 
@@ -194,16 +243,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
       <!-- Order Review Sidebar -->
       <div class="col-lg-5">
         <div class="bg-white p-4 rounded-4 border shadow-sm sticky-top" style="top: 90px;">
-          <h5 class="fw-bold mb-3 border-bottom pb-2">Đơn Hàng Của Bạn (<?php echo get_cart_count(); ?> món)</h5>
+          <h5 class="fw-bold mb-3 border-bottom pb-2"><i class="fas fa-cart-flatbed-suitcase text-primary me-2"></i> Đơn Hàng Của Bạn (<?php echo get_cart_count(); ?> món)</h5>
 
           <div class="d-flex flex-column gap-2 mb-3" style="max-height: 250px; overflow-y: auto;">
             <?php foreach ($cart as $item): ?>
               <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                 <div class="d-flex align-items-center gap-2">
-                  <img src="assets/images/products/<?php echo htmlspecialchars($item['image']); ?>" style="width: 45px; height: 45px; object-fit: cover;" class="rounded border">
+                  <img src="assets/images/products/<?php echo htmlspecialchars($item['image']); ?>" style="width: 48px; height: 48px; object-fit: cover;" class="rounded border">
                   <div>
-                    <div class="small fw-bold text-truncate" style="max-width: 170px;"><?php echo htmlspecialchars($item['name']); ?></div>
-                    <small class="text-muted">SL: <?php echo $item['quantity']; ?></small>
+                    <div class="small fw-bold text-truncate" style="max-width: 170px;" title="<?php echo htmlspecialchars($item['name']); ?>"><?php echo htmlspecialchars($item['name']); ?></div>
+                    <small class="text-muted">SL: <?php echo $item['quantity']; ?> × <?php echo format_price($item['price']); ?></small>
                   </div>
                 </div>
                 <span class="small fw-bold text-danger"><?php echo format_price($item['price'] * $item['quantity']); ?></span>
@@ -218,7 +267,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
 
           <?php if ($discount > 0): ?>
             <div class="d-flex justify-content-between mb-2 text-success small">
-              <span>Giảm giá (<?php echo htmlspecialchars($couponInfo['code']); ?>):</span>
+              <span>Giảm giá Voucher (<?php echo htmlspecialchars($couponInfo['code']); ?>):</span>
               <span class="fw-bold">-<?php echo format_price($discount); ?></span>
             </div>
           <?php endif; ?>
@@ -226,18 +275,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
           <div class="d-flex justify-content-between mb-2 small">
             <span class="text-secondary">Phí giao hàng:</span>
             <span class="fw-bold <?php echo $shippingFee == 0 ? 'text-success' : ''; ?>">
-              <?php echo $shippingFee == 0 ? 'Miễn phí' : format_price($shippingFee); ?>
+              <?php echo $shippingFee == 0 ? 'Miễn phí vận chuyển' : format_price($shippingFee); ?>
             </span>
           </div>
 
           <div class="border-top pt-3 mt-3 d-flex justify-content-between align-items-baseline mb-4">
-            <span class="fw-bold">Tổng thanh toán:</span>
+            <span class="fw-bold fs-6">Tổng thanh toán:</span>
             <span class="fs-4 fw-bold text-danger"><?php echo format_price($finalTotal); ?></span>
           </div>
 
-          <button type="submit" name="place_order" class="btn btn-primary-custom w-100 justify-content-center py-3 fs-6">
-            <i class="fas fa-lock me-2"></i> Xác Nhận Đặt Hàng
+          <button type="submit" name="place_order" class="btn btn-primary-custom w-100 justify-content-center py-3 fs-6 shadow">
+            <i class="fas fa-shield-check me-2"></i> Xác Nhận Đặt Hàng
           </button>
+
+          <div class="text-center mt-3 text-muted small">
+            <i class="fas fa-lock text-success me-1"></i> Thông tin thanh toán được mã hóa và bảo mật tuyệt đối.
+          </div>
         </div>
       </div>
 
@@ -245,5 +298,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
   </form>
 
 </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const cards = document.querySelectorAll('.payment-option-card');
+  const radios = document.querySelectorAll('.payment-radio');
+
+  function updatePaymentStyles() {
+    radios.forEach(radio => {
+      const card = radio.closest('.payment-option-card');
+      const preview = card.querySelector('.banking-info-preview');
+      if (radio.checked) {
+        card.classList.add('border-primary', 'bg-light');
+        card.style.boxShadow = '0 0 0 2px rgba(14, 165, 233, 0.2)';
+        if (preview) preview.style.display = 'block';
+      } else {
+        card.classList.remove('border-primary', 'bg-light');
+        card.style.boxShadow = 'none';
+        if (preview) preview.style.display = 'none';
+      }
+    });
+  }
+
+  radios.forEach(r => r.addEventListener('change', updatePaymentStyles));
+  updatePaymentStyles();
+});
+</script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

@@ -75,11 +75,18 @@ require __DIR__ . '/includes/header.php';
       </table>
     </div>
 
-    <?php if ($order['payment_method'] === 'bank'): ?>
-      <div class="demo-hint" style="text-align:left">
-        <strong>Hướng dẫn chuyển khoản</strong><br>
-        <?= e(setting('bank_info')) ?><br>
-        Nội dung chuyển khoản: <strong><?= e($order['order_code']) ?></strong>
+    <?php if ($order['payment_method'] === 'bank' || $order['payment_method'] === 'momo'): ?>
+      <div class="demo-hint" style="text-align:center;padding:var(--sp-5);background:rgba(99,102,241,0.06);border:1.5px dashed var(--primary);border-radius:var(--r-md);margin:var(--sp-5) 0">
+        <strong style="font-size:1.05rem;color:var(--primary);display:block;margin-bottom:12px">Quét Mã VietQR Thanh Toán Tự Động 24/7</strong>
+        <div style="display:inline-block;background:#fff;padding:10px;border-radius:8px;box-shadow:var(--shadow-sm);margin-bottom:12px">
+          <img src="https://api.vietqr.io/image/970422-888899998888-qr_only.jpg?amount=<?= (int)$order['total'] ?>&addInfo=<?= urlencode($order['order_code']) ?>" alt="VietQR" style="width:190px;height:190px;object-fit:contain">
+        </div>
+        <div style="font-size:0.875rem;color:var(--fg-muted);line-height:1.7;text-align:left;max-width:400px;margin-inline:auto">
+          <div>Ngân hàng: <strong>MB Bank (Ngân hàng Quân Đội)</strong></div>
+          <div>Số tài khoản: <strong style="font-family:monospace;color:var(--primary)">888899998888</strong></div>
+          <div>Chủ tài khoản: <strong>HIEUMINI DIGITAL SOURCE</strong></div>
+          <div>Nội dung CK: <strong style="color:var(--danger);font-family:monospace"><?= e($order['order_code']) ?></strong></div>
+        </div>
       </div>
     <?php endif; ?>
 

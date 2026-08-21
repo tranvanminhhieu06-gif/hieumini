@@ -18,6 +18,13 @@ if (!$order) {
 $itemStmt = $pdo->prepare("SELECT * FROM order_items WHERE order_id = ?");
 $itemStmt->execute([$order['id']]);
 $orderItems = $itemStmt->fetchAll();
+
+$isBankTransfer = in_array($order['payment_method'], ['banking', 'momo'], true);
+$bankName = 'MB Bank (Ngân hàng Quân Đội)';
+$bankAccount = '888899998888';
+$accountHolder = 'DATCYBER VIETNAM';
+$transferMemo = $order['order_code'];
+$qrUrl = "https://api.vietqr.io/image/970422-{$bankAccount}-qr_only.jpg?amount=" . (int)$order['final_amount'] . "&addInfo=" . urlencode($transferMemo);
 ?>
 
 <main class="container my-4">
@@ -31,7 +38,7 @@ $orderItems = $itemStmt->fetchAll();
     <h2 class="fw-bold text-dark">Đặt Hàng Thành Công!</h2>
     <p class="text-secondary mb-2">Cảm ơn bạn đã tin tưởng mua sắm tại <strong>DatCyber</strong>. Đơn hàng của bạn đã được tiếp nhận và đang được xử lý.</p>
     <div class="badge bg-light text-primary border fs-6 px-3 py-2">
-      Mã đơn hàng: <strong class="font-monospace"><?php echo htmlspecialchars($order['order_code']); ?></strong>
+      Mã đơn hàng: <strong class="font-monospace text-danger"><?php echo htmlspecialchars($order['order_code']); ?></strong>
     </div>
 
     <!-- Order Tracking Timeline Simulation -->
@@ -77,6 +84,84 @@ $orderItems = $itemStmt->fetchAll();
       </div>
     </div>
   </div>
+
+  <?php if ($isBankTransfer): ?>
+  <!-- VIETQR PAYMENT CARD -->
+  <div class="card border-primary border-2 shadow-sm rounded-4 mb-4 overflow-hidden" style="background: linear-gradient(to bottom, #f0f9ff, #ffffff);">
+    <div class="card-header bg-primary text-white p-3 d-flex align-items-center justify-content-between">
+      <div class="fw-bold fs-5">
+        <i class="fas fa-qrcode me-2"></i> Quét Mã VietQR Chuyển Khoản Tự Động 24/7
+      </div>
+      <span class="badge bg-warning text-dark"><i class="fas fa-bolt me-1"></i>Xác nhận tức thì</span>
+    </div>
+    <div class="card-body p-4">
+      <div class="row align-items-center g-4">
+        
+        <!-- QR Code Column -->
+        <div class="col-md-5 text-center">
+          <div class="bg-white p-3 rounded-4 shadow-sm border d-inline-block">
+            <img src="<?php echo $qrUrl; ?>" alt="Mã VietQR" class="img-fluid rounded-3" style="max-width: 220px; height: auto;">
+          </div>
+          <div class="mt-2 text-muted small">
+            <i class="fas fa-camera me-1"></i> Mở App Ngân hàng hoặc MoMo để quét mã
+          </div>
+        </div>
+
+        <!-- Transfer Information Column -->
+        <div class="col-md-7">
+          <div class="bg-white p-3 p-md-4 rounded-4 border shadow-sm">
+            <h6 class="fw-bold text-primary mb-3"><i class="fas fa-building-columns me-2"></i>Thông Tin Tài Khoản Thụ Hưởng</h6>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="text-muted">Ngân hàng:</span>
+              <strong class="text-dark"><?php echo $bankName; ?></strong>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="text-muted">Số tài khoản:</span>
+              <div class="d-flex align-items-center gap-2">
+                <strong class="text-primary fs-5 font-monospace" id="accNum"><?php echo $bankAccount; ?></strong>
+                <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2" onclick="copyText('<?php echo $bankAccount; ?>', this)" title="Sao chép">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="text-muted">Chủ tài khoản:</span>
+              <strong class="text-dark"><?php echo $accountHolder; ?></strong>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="text-muted">Số tiền:</span>
+              <div class="d-flex align-items-center gap-2">
+                <strong class="text-danger fs-5"><?php echo format_price($order['final_amount']); ?></strong>
+                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="copyText('<?php echo (int)$order['final_amount']; ?>', this)" title="Sao chép số tiền">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2">
+              <span class="text-muted">Nội dung CK (Bắt buộc):</span>
+              <div class="d-flex align-items-center gap-2">
+                <strong class="badge bg-danger fs-6 font-monospace" id="memoText"><?php echo htmlspecialchars($transferMemo); ?></strong>
+                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="copyText('<?php echo htmlspecialchars($transferMemo); ?>', this)" title="Sao chép nội dung">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="alert alert-warning py-2 px-3 small mt-3 mb-0">
+              <i class="fas fa-circle-info me-1"></i> Quý khách vui lòng nhập chính xác <strong>Nội dung chuyển khoản</strong> để hệ thống tự động kích hoạt đơn hàng trong 1-3 phút.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <?php endif; ?>
 
   <!-- Order Details & Invoice Card -->
   <div class="row g-4">
@@ -135,7 +220,16 @@ $orderItems = $itemStmt->fetchAll();
         <?php if (!empty($order['customer_note'])): ?>
           <p class="mb-1"><strong>Ghi chú:</strong> <em><?php echo htmlspecialchars($order['customer_note']); ?></em></p>
         <?php endif; ?>
-        <p class="mb-3"><strong>Thanh toán:</strong> <span class="badge bg-primary text-uppercase"><?php echo htmlspecialchars($order['payment_method']); ?></span></p>
+        <p class="mb-3">
+          <strong>Thanh toán:</strong> 
+          <?php if ($order['payment_method'] === 'banking'): ?>
+            <span class="badge bg-primary text-uppercase"><i class="fas fa-qrcode me-1"></i>VietQR Chuyển khoản</span>
+          <?php elseif ($order['payment_method'] === 'momo'): ?>
+            <span class="badge bg-danger text-uppercase"><i class="fas fa-wallet me-1"></i>Ví MoMo</span>
+          <?php else: ?>
+            <span class="badge bg-success text-uppercase"><i class="fas fa-money-bill-wave me-1"></i>COD Tiền mặt</span>
+          <?php endif; ?>
+        </p>
 
         <div class="border-top pt-3">
           <div class="d-flex justify-content-between mb-1 small">
@@ -144,7 +238,7 @@ $orderItems = $itemStmt->fetchAll();
           </div>
           <?php if ($order['discount_amount'] > 0): ?>
             <div class="d-flex justify-content-between mb-1 text-success small">
-              <span>Giảm giá:</span>
+              <span>Giảm giá Voucher:</span>
               <span>-<?php echo format_price($order['discount_amount']); ?></span>
             </div>
           <?php endif; ?>
@@ -164,5 +258,20 @@ $orderItems = $itemStmt->fetchAll();
   </div>
 
 </main>
+
+<script>
+function copyText(val, btn) {
+  navigator.clipboard.writeText(val).then(() => {
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check text-success"></i>';
+    if (typeof showToast === 'function') {
+      showToast('Đã sao chép: ' + val, 'success');
+    }
+    setTimeout(() => { btn.innerHTML = origHtml; }, 2000);
+  }).catch(() => {
+    alert('Đã sao chép: ' + val);
+  });
+}
+</script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

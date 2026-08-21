@@ -28,8 +28,8 @@ function sanitize_html($html) {
 
 // Validate Vietnamese phone number format (10 digits starting with 03, 05, 07, 08, 09)
 function is_valid_phone($phone) {
-    $phone = preg_replace('/[\s\.\-\(\)]/', '', $phone);
-    return (bool)preg_match('/^(0[3|5|7|8|9])[0-9]{8}$/', $phone);
+    $phone = preg_replace('/[^\d]/', '', (string)$phone);
+    return (bool)preg_match('/^(0[35789])[0-9]{8}$/', $phone);
 }
 
 // Validate email address

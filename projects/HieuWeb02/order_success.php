@@ -50,6 +50,21 @@ if (!$order && isset($_SESSION['last_order'])) {
             </div>
         </div>
 
+        <!-- VietQR Chuyển Khoản nếu chọn Banking -->
+        <?php if (($order['payment_method'] ?? '') === 'bank_transfer' || ($order['payment_method'] ?? '') === 'momo'): ?>
+        <div style="background: rgba(99, 102, 241, 0.08); border: 1.5px dashed var(--primary); border-radius: var(--radius-md); padding: 24px; margin-bottom: 30px; text-align: center;">
+            <h4 style="color: var(--accent); font-size: 1.1rem; margin-bottom: 12px;"><i class="fa-solid fa-qrcode"></i> Quét Mã VietQR Thanh Toán Tự Động 24/7</h4>
+            <div style="display: inline-block; background: #fff; padding: 12px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); margin-bottom: 14px;">
+                <img src="https://api.vietqr.io/image/970422-888899998888-qr_only.jpg?amount=<?= (int)($order['total_amount'] ?? 0) ?>&addInfo=<?= urlencode($order_code) ?>" alt="VietQR" style="width: 200px; height: 200px; object-fit: contain;">
+            </div>
+            <div style="font-size: 0.9rem; color: #cbd5e1; line-height: 1.8;">
+                <div>Ngân hàng: <strong style="color: #fff;">MB Bank (Ngân hàng Quân Đội)</strong> | STK: <strong style="color: var(--accent); font-family: monospace; font-size: 1.05rem;">888899998888</strong></div>
+                <div>Chủ tài khoản: <strong style="color: #fff;">HIEUMINI TECH STORE</strong></div>
+                <div>Nội dung CK: <strong style="color: #f43f5e; font-family: monospace; font-size: 1.05rem;"><?= htmlspecialchars($order_code) ?></strong></div>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <!-- Action Buttons -->
         <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
             <a href="index.php" class="btn btn-primary">
