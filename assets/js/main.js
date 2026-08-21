@@ -372,6 +372,37 @@
   }
 
   /* -----------------------------------------------------------------
+   | 10b. KIỂM TRA KHUNG NHÚNG TRÊN TRANG CHI TIẾT
+   |      Nếu dự án con trả về trang trống hoặc lỗi CSDL thì hiện thông
+   |      báo hướng dẫn thay vì để khung trắng.
+   * ----------------------------------------------------------------- */
+  function initStageInspect() {
+    var iframe = document.querySelector('[data-stage-frame]');
+    var fallback = document.querySelector('[data-stage-fallback]');
+    if (!iframe || !fallback) return;
+
+    var ERR_RE = /kết nối được cơ sở dữ liệu|SQLSTATE|Fatal error|Connection refused|Uncaught|Parse error/i;
+
+    function check() {
+      try {
+        var doc = iframe.contentDocument || iframe.contentWindow.document;
+        var text = (doc && doc.body ? doc.body.innerText : '').trim();
+        if (text.length < 12 || (text.length < 600 && ERR_RE.test(text))) {
+          fallback.hidden = false;
+          iframe.style.visibility = 'hidden';
+        } else {
+          fallback.hidden = true;
+          iframe.style.visibility = '';
+        }
+      } catch (e) { /* khác nguồn: giữ nguyên */ }
+    }
+
+    iframe.addEventListener('load', check);
+    // Kiểm tra lần đầu nếu iframe đã tải xong trước khi gắn sự kiện
+    if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') check();
+  }
+
+  /* -----------------------------------------------------------------
    | 11. CHUYỂN KHUNG NHÌN MÁY TÍNH / MÁY TÍNH BẢNG / ĐIỆN THOẠI
    * ----------------------------------------------------------------- */
   function initViewportSwitch() {
@@ -477,6 +508,7 @@
     initRipple();
     initLiveFrames();
     initFilter();
+    initStageInspect();
     initViewportSwitch();
     initPageTransition();
     initToasts();

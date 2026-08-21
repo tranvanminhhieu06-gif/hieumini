@@ -22,6 +22,36 @@
 
 ---
 
+## Chạy trên localhost (XAMPP) — nạp CSDL cho cả 6 dự án con
+
+> **Vì sao 6 dự án con hiện khung trắng?** Mỗi dự án con dùng một cơ sở dữ liệu
+> riêng. Nếu CSDL đó chưa được nạp vào MySQL của XAMPP, dự án báo lỗi kết nối và
+> khung xem trực tiếp bị trắng. Đây là nguyên nhân duy nhất — bản thân mã nguồn
+> các dự án chạy tốt (đã kiểm chứng).
+
+**Cách sửa nhanh nhất:** double-click **`import-local.bat`** trong thư mục
+`HieuWebsite`. Nó nạp một lần cả 7 cơ sở dữ liệu vào MySQL của XAMPP:
+
+| CSDL | Dự án |
+|---|---|
+| `hieumini_portfolio` | Cổng trưng bày HieuMini |
+| `hieumini_db` | HieuWeb01 — thời trang (17 sản phẩm) |
+| `hieumini_bookstore_db` | HieuWeb02 — công nghệ |
+| `hieumini_furniture_db` | HieuWeb03 — học tập |
+| `datcyber_appliances_db` | HieuWeb04 — gia dụng |
+| `hieumini_gym_db` | HieuWeb05 — thể hình |
+| `hieumini_market_db` | HieuWeb06 — chợ mã nguồn |
+
+Hoặc nạp thủ công: phpMyAdmin → **Import** → chọn `database/tidb_all.sql`.
+Nạp xong, tải lại `http://localhost/HieuWebsite/` — cả 6 khung xem trực tiếp
+đều hiển thị.
+
+> Tài khoản quản trị demo dùng chung: `admin@hieumini.vn` / `demo123`.
+
+---
+
+## Triển khai lên Internet (Render + TiDB Cloud)
+
 ## Bước 1 — Tạo mật khẩu TiDB
 
 Trong cửa sổ **Connect to hieumini** mà bạn đang mở:

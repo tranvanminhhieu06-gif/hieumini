@@ -129,7 +129,20 @@ require __DIR__ . '/includes/header.php';
           <div class="stage-body" data-stage-body>
             <?php if ($exists): ?>
               <iframe src="<?= e($liveUrl) ?>" title="Bản chạy trực tiếp của <?= e($project['name']) ?>"
-                      loading="lazy"></iframe>
+                      data-stage-frame loading="lazy"></iframe>
+              <div class="stage-fallback" data-stage-fallback hidden>
+                <?= icon('database', 'ico') ?>
+                <h3>Chưa nạp cơ sở dữ liệu của dự án này</h3>
+                <p>
+                  Dự án <b><?= e($project['name']) ?></b> cần cơ sở dữ liệu
+                  <code><?= e($project['db_name']) ?></code>. Hãy nạp
+                  <code>database/tidb_all.sql</code> (hoặc chạy <code>import-local.bat</code>)
+                  để bản chạy trực tiếp hiển thị đầy đủ.
+                </p>
+                <a class="btn btn--primary btn--sm" href="<?= e($liveUrl) ?>" target="_blank" rel="noopener">
+                  <?= icon('external', 'ico ico-sm') ?> Vẫn mở thử ở tab mới
+                </a>
+              </div>
             <?php else: ?>
               <div class="empty-state" style="border:0;margin:0">
                 <?= icon('inbox', 'ico') ?>
