@@ -88,9 +88,6 @@ $heroGradientFrom = 5; // Từ "khám" trở đi tô màu gradient
           <a class="btn btn--primary" href="#projects">
             <?= icon('grid', 'ico ico-sm') ?> Xem <?= count($projects) ?> dự án
           </a>
-          <a class="btn btn--ghost" href="<?= e(url('BaoCao.docx')) ?>">
-            <?= icon('list', 'ico ico-sm') ?> Tải báo cáo (.docx)
-          </a>
           <a class="btn btn--ghost" href="<?= e(url('about.php')) ?>">
             <?= icon('code', 'ico ico-sm') ?> Kiến trúc hệ thống
           </a>
@@ -183,6 +180,11 @@ $heroGradientFrom = 5; // Từ "khám" trở đi tô màu gradient
               <div class="frame-skeleton">
                 <span class="frame-spinner"></span>
                 Đang nạp <?= e($p['code']) ?>…
+              </div>
+              <div class="frame-fallback" hidden>
+                <?= icon('database', 'ico') ?>
+                <b><?= e($p['name']) ?></b>
+                <span>Bản xem trước cần nạp cơ sở dữ liệu <code><?= e($p['db_name']) ?></code></span>
               </div>
             <?php else: ?>
               <div class="frame-skeleton" style="opacity:1">

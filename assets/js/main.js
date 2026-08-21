@@ -298,10 +298,32 @@
     var frames = Array.prototype.slice.call(document.querySelectorAll('[data-live-src]'));
     if (!frames.length) return;
 
+    // Dấu hiệu cho thấy dự án con đang báo lỗi kết nối cơ sở dữ liệu
+    var ERR_RE = /kết nối được cơ sở dữ liệu|cơ sở dữ liệu|SQLSTATE|Fatal error|Connection refused|database/i;
+
+    function inspect(wrap, iframe) {
+      // Cùng nguồn nên đọc được nội dung; nếu trang trống hoặc là trang lỗi
+      // CSDL thì hiện thẻ thông báo gọn thay cho khung trắng.
+      try {
+        var doc = iframe.contentDocument || iframe.contentWindow.document;
+        var text = (doc && doc.body ? doc.body.innerText : '').trim();
+        if (text.length < 12 || (text.length < 400 && ERR_RE.test(text))) {
+          wrap.classList.add('is-fallback');
+          var fb = wrap.querySelector('.frame-fallback');
+          if (fb) fb.hidden = false;
+        }
+      } catch (e) {
+        // Khác nguồn (hiếm khi xảy ra) → giữ nguyên khung
+      }
+    }
+
     function load(wrap) {
       var iframe = wrap.querySelector('iframe');
       if (!iframe || iframe.src) return;
-      iframe.addEventListener('load', function () { wrap.classList.add('is-ready'); }, { once: true });
+      iframe.addEventListener('load', function () {
+        wrap.classList.add('is-ready');
+        inspect(wrap, iframe);
+      }, { once: true });
       // Nếu dự án con không phản hồi trong 8 giây thì vẫn gỡ lớp chờ.
       setTimeout(function () { wrap.classList.add('is-ready'); }, 8000);
       iframe.src = wrap.getAttribute('data-live-src');
