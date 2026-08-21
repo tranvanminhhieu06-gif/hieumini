@@ -362,56 +362,17 @@
   }
 
   /* -----------------------------------------------------------------
-   | 10b. KIỂM TRA KHUNG NHÚNG TRÊN TRANG CHI TIẾT
-   |      Nếu dự án con trả về trang trống hoặc lỗi CSDL thì hiện thông
-   |      báo hướng dẫn thay vì để khung trắng.
+   | 10b. KHUNG NHÚNG TRANG CHI TIẾT
+   |      Luôn hiện website thật trong iframe.
+   |      Fallback chỉ hiện nếu người dùng tự mở bằng nút "Mở tab mới".
    * ----------------------------------------------------------------- */
   function initStageInspect() {
     var iframe = document.querySelector('[data-stage-frame]');
     var fallback = document.querySelector('[data-stage-fallback]');
-    if (!iframe || !fallback) return;
 
-    var ERR_RE = /SQLSTATE\[|Fatal error:|Uncaught PDOException|Unknown database 'hieu/i;
-
-    function check() {
-      try {
-        var doc = iframe.contentDocument || iframe.contentWindow.document;
-        if (!doc || !doc.body) return;
-
-        // Bỏ qua nếu iframe chưa nạp URL thật (đang là about:blank)
-        var href = '';
-        try { href = doc.location ? doc.location.href : ''; } catch (e) {}
-        if (href === 'about:blank' || href === '') return;
-
-        var text = (doc.body.innerText || '').trim();
-
-        // Chỉ hiện cảnh báo khi có chuỗi lỗi CSDL/PHP chết người
-        if (text.length < 400 && ERR_RE.test(text)) {
-          fallback.hidden = false;
-          iframe.style.visibility = 'hidden';
-        } else {
-          fallback.hidden = true;
-          iframe.style.visibility = '';
-        }
-      } catch (e) {
-        // Khi khác nguồn hoặc không đọc được DOM con: mặc định giữ iframe hiển thị
-        fallback.hidden = true;
-        iframe.style.visibility = '';
-      }
-    }
-
-    iframe.addEventListener('load', function () {
-      setTimeout(check, 200);
-    });
-
-    try {
-      if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
-        var curHref = iframe.contentDocument.location ? iframe.contentDocument.location.href : '';
-        if (curHref && curHref !== 'about:blank') {
-          setTimeout(check, 200);
-        }
-      }
-    } catch (e) {}
+    // Luôn ẩn fallback - để iframe hiện website thật
+    if (fallback) fallback.hidden = true;
+    if (iframe) iframe.style.visibility = '';
   }
 
   /* -----------------------------------------------------------------
