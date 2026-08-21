@@ -2,8 +2,8 @@
 /**
  * Quản Lý Người Dùng & Phân Quyền - Admin HieuMini
  */
-require_once __DIR__ . '/../../config/db.php';
-require_once __DIR__ . '/../../includes/functions.php';
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 // Thay đổi phân quyền
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'change_role') {

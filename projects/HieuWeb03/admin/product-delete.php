@@ -1,6 +1,6 @@
 <?php
 // admin/product-delete.php
-require_once __DIR__ . '/../../config/app.php';
+require_once __DIR__ . '/../config/app.php';
 require_admin();
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;

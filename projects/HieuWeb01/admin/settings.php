@@ -6,7 +6,7 @@ $adminTitle = "Cài Đặt Cửa Hàng & Hệ Thống";
 require_once __DIR__ . '/includes/header.php';
 
 // File lưu trữ cấu hình JSON nếu cần persist hoặc lấy mặc định
-$settingsFile = __DIR__ . '/../../config/shop_settings.json';
+$settingsFile = __DIR__ . '/../config/shop_settings.json';
 $defaultSettings = [
     'shop_name' => 'HieuMini Luxury Fashion Studio',
     'hotline' => '0988.889.999',
