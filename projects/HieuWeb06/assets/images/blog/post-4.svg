@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450" role="img" aria-label="Tối ưu Core Web Vitals">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F59E0B"/><stop offset="1" stop-color="#EC4899"/></linearGradient>
+    <linearGradient id="bgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#141430"/><stop offset="1" stop-color="#0B0B18"/></linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="55"/></filter>
+  </defs>
+  <rect width="800" height="450" fill="url(#bgg)"/>
+  <circle cx="624" cy="99" r="140" fill="#F59E0B" opacity=".4" filter="url(#blur)"/>
+  <circle cx="160" cy="382" r="150" fill="#EC4899" opacity=".3" filter="url(#blur)"/>
+  <g transform="translate(56,64)">
+    <rect width="46" height="6" rx="3" fill="url(#g)"/>
+    <text y="70" font-family="Segoe UI, Be Vietnam Pro, system-ui, sans-serif" font-size="40" font-weight="800" fill="#EDEFFA">Tối ưu Core Web Vitals</text>
+    <text y="112" font-family="Segoe UI, Be Vietnam Pro, system-ui, sans-serif" font-size="19" fill="#A2A7C6">HieuMini · Blog kiến thức lập trình web</text>
+  </g>
+  <g transform="translate(56,310)" opacity=".9">
+    <rect width="300" height="9" rx="4.5" fill="rgba(150,160,255,.2)"/>
+    <rect y="24" width="240" height="9" rx="4.5" fill="rgba(150,160,255,.16)"/>
+    <rect y="48" width="180" height="9" rx="4.5" fill="rgba(150,160,255,.12)"/>
+    <rect y="80" width="110" height="12" rx="6" fill="url(#g)"/>
+  </g>
+</svg>

@@ -1,0 +1,29 @@
+# robots.txt - HieuMini
+# Hướng dẫn cho robot của công cụ tìm kiếm
+
+User-agent: *
+Allow: /
+
+# Không lập chỉ mục các trang riêng tư hoặc không có giá trị tìm kiếm
+Disallow: /admin/
+Disallow: /includes/
+Disallow: /uploads/
+Disallow: /cart.php
+Disallow: /checkout.php
+Disallow: /order-success.php
+Disallow: /account.php
+Disallow: /wishlist.php
+Disallow: /login.php
+Disallow: /register.php
+Disallow: /logout.php
+Disallow: /ajax-cart.php
+Disallow: /*?sort=
+Disallow: /*?page=
+
+# Cho phép robot tải tài nguyên hiển thị để đánh giá đúng trải nghiệm
+Allow: /assets/
+
+Crawl-delay: 1
+
+# Sơ đồ website (đổi tên miền khi đưa lên máy chủ thật)
+Sitemap: http://localhost/DoAnWebsite/projects/HieuMini/sitemap.php

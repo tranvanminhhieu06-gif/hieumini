@@ -1,0 +1,13 @@
+# HIEUMINI LUXURY FITNESS CLUB - APACHE SERVER CONFIGURATION
+# Force UTF-8 Encoding globally to prevent Vietnamese font corruption
+
+AddDefaultCharset UTF-8
+DefaultLanguage vi-VN
+
+<IfModule mod_mime.c>
+    AddCharset UTF-8 .html .php .css .js .json .xml
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header set Content-Type "text/html; charset=UTF-8" "expr=%{CONTENT_TYPE} =~ m#text/html#i"
+</IfModule>

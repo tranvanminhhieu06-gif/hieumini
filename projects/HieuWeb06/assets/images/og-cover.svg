@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="HieuMini - Chợ mã nguồn website chuẩn SEO">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7C3AED"/><stop offset="1" stop-color="#22D3EE"/></linearGradient>
+    <linearGradient id="bgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14142E"/><stop offset="1" stop-color="#0B0B18"/></linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="rgba(150,160,255,.09)"/></pattern>
+    <filter id="blur"><feGaussianBlur stdDeviation="90"/></filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bgg)"/>
+  <circle cx="200" cy="120" r="220" fill="#7C3AED" opacity=".45" filter="url(#blur)"/>
+  <circle cx="1020" cy="520" r="240" fill="#22D3EE" opacity=".35" filter="url(#blur)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <g transform="translate(90,150)">
+    <rect width="58" height="58" rx="16" fill="url(#g)" opacity=".2"/>
+    <rect width="58" height="58" rx="16" fill="none" stroke="url(#g)" stroke-width="2.5"/>
+    <path d="M16 46V12h6v13h14V12h6v34h-6V31H22v15z" fill="url(#g)"/>
+    <text x="76" y="42" font-family="Segoe UI, system-ui, sans-serif" font-size="38" font-weight="800" fill="#E9EAF6">Hieu<tspan fill="url(#g)">Mini</tspan></text>
+    <text y="150" font-family="Segoe UI, system-ui, sans-serif" font-size="66" font-weight="800" fill="#EDEFFA">Chợ mã nguồn website</text>
+    <text y="228" font-family="Segoe UI, system-ui, sans-serif" font-size="66" font-weight="800" fill="url(#g)">chuẩn SEO cho người Việt</text>
+    <text y="292" font-family="Segoe UI, system-ui, sans-serif" font-size="27" fill="#A2A7C6">PHP 8 · MySQL 8 · Code sạch · Bảo mật · Tài liệu đầy đủ · Hỗ trợ trọn đời</text>
+  </g>
+</svg>

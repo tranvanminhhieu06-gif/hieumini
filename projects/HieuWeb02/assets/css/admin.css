@@ -1,0 +1,253 @@
+/* ==========================================================
+   HIEUMINI TECH STORE - ADMIN DASHBOARD DESIGN SYSTEM
+   ========================================================== */
+
+:root {
+    --admin-sidebar-w: 260px;
+    --admin-bg: #0f172a;
+    --admin-card: #1e293b;
+    --admin-card-header: #1e293b;
+    --admin-border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-body {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--admin-bg);
+}
+
+/* Sidebar */
+.admin-sidebar {
+    width: var(--admin-sidebar-w);
+    background: #090d16;
+    border-right: var(--admin-border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    transition: var(--transition);
+}
+
+.admin-brand {
+    padding: 24px 20px;
+    font-size: 1.3rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: var(--admin-border);
+    color: #fff;
+}
+.admin-brand i {
+    color: var(--primary);
+}
+
+.admin-menu {
+    padding: 20px 0;
+    flex: 1;
+    overflow-y: auto;
+}
+.menu-label {
+    padding: 10px 20px 6px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+.admin-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    color: #94a3b8;
+    font-size: 0.92rem;
+    font-weight: 500;
+    transition: var(--transition);
+}
+.admin-nav-item:hover, .admin-nav-item.active {
+    color: #fff;
+    background: rgba(99, 102, 241, 0.12);
+    border-left: 3px solid var(--primary);
+}
+.admin-nav-item i {
+    width: 20px;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.admin-sidebar-footer {
+    padding: 16px 20px;
+    border-top: var(--admin-border);
+}
+
+/* Main Content Area */
+.admin-main {
+    margin-left: var(--admin-sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.admin-header {
+    background: #090d16;
+    border-bottom: var(--admin-border);
+    padding: 16px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+}
+
+.admin-user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.admin-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+}
+
+.admin-content {
+    padding: 30px;
+    flex: 1;
+}
+
+/* KPI Metric Cards */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+.metric-card {
+    background: var(--admin-card);
+    border: var(--admin-border);
+    border-radius: var(--radius-md);
+    padding: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: var(--transition);
+}
+.metric-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(99, 102, 241, 0.4);
+}
+.metric-val {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin: 4px 0 2px;
+    color: #fff;
+}
+.metric-title {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+.metric-icon-box {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+.metric-icon-box.purple { background: rgba(99, 102, 241, 0.2); color: #818cf8; }
+.metric-icon-box.cyan   { background: rgba(6, 182, 212, 0.2); color: #38bdf8; }
+.metric-icon-box.green  { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+.metric-icon-box.pink   { background: rgba(236, 72, 153, 0.2); color: #f472b6; }
+
+/* Admin Data Tables */
+.admin-card {
+    background: var(--admin-card);
+    border: var(--admin-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+.admin-card-header {
+    padding: 18px 24px;
+    border-bottom: var(--admin-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.admin-card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+.admin-table th {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 14px 20px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    border-bottom: var(--admin-border);
+}
+.admin-table td {
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    vertical-align: middle;
+    font-size: 0.9rem;
+}
+.admin-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.table-img {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.action-btns {
+    display: flex;
+    gap: 8px;
+}
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    color: #fff;
+}
+.btn-icon.edit { background: rgba(6, 182, 212, 0.2); color: #38bdf8; }
+.btn-icon.edit:hover { background: #06b6d4; color: #fff; }
+.btn-icon.delete { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+.btn-icon.delete:hover { background: #ef4444; color: #fff; }

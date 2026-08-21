@@ -1,0 +1,31 @@
+# Giảm kích thước ảnh Docker.
+# Lưu ý: KHÔNG loại BaoCao.docx và README.md — chân trang HieuMini có liên kết
+# tới hai tệp này, loại đi sẽ khiến người xem bấm vào gặp lỗi 404.
+
+.git
+.gitignore
+.github
+
+# Script chỉ chạy trên máy cá nhân lúc phát triển
+push-github.bat
+import-tidb.bat
+*.py
+projects/*/*.py
+__pycache__/
+projects/*/__pycache__/
+
+# Kịch bản SQL gộp — chỉ dùng một lần khi nạp vào TiDB, không cần trong container
+database/tidb_all.sql
+
+# Trang tự kiểm tra chỉ dùng khi cài đặt trên máy mới
+projects/*/test_system.php
+
+# Tệp hệ điều hành và nhật ký
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.log
+error_log
+tmp/
+temp/

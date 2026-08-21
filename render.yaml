@@ -1,0 +1,59 @@
+# =====================================================================
+#  HieuMini — Cấu hình dịch vụ Render (Infrastructure as Code)
+#  Render đọc tệp này khi bạn chọn "Blueprint" lúc tạo dịch vụ.
+#  Nếu tạo Web Service thủ công thì tệp này không bắt buộc,
+#  nhưng vẫn hữu ích như bản ghi chép các biến môi trường cần đặt.
+# =====================================================================
+services:
+  - type: web
+    name: hieumini
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: singapore          # Gần TiDB ap-southeast-1 nhất → độ trễ thấp
+    branch: main
+    healthCheckPath: /index.php
+
+    envVars:
+      # ---------- Kết nối TiDB Cloud ----------
+      # Chép từ TiDB Console → Connect. PORT của TiDB luôn là 4000.
+      - key: DB_HOST
+        value: gateway01.ap-southeast-1.prod.aws.tidbcloud.com
+      - key: DB_PORT
+        value: "4000"
+      - key: DB_USER
+        value: 4WXwYbGLHmDTbak.root
+      - key: DB_PASS
+        sync: false            # sync:false = Render hỏi giá trị, KHÔNG lưu vào Git
+      - key: DB_SSL
+        value: "true"          # TiDB bắt buộc kết nối mã hóa
+
+      # ---------- Tên 7 cơ sở dữ liệu ----------
+      # Bảy CSDL nằm chung một cluster TiDB, chỉ khác tên.
+      - key: DB_NAME_PORTAL
+        value: hieumini_portfolio
+      - key: DB_NAME_WEB01
+        value: hieumini_db
+      - key: DB_NAME_WEB02
+        value: hieumini_bookstore_db
+      - key: DB_NAME_WEB03
+        value: hieumini_furniture_db
+      - key: DB_NAME_WEB04
+        value: datcyber_appliances_db
+      - key: DB_NAME_WEB05
+        value: hieumini_gym_db
+      - key: DB_NAME_WEB06
+        value: hieumini_market_db
+
+      # ---------- Ứng dụng ----------
+      - key: APP_DEBUG
+        value: "0"             # Đặt "1" tạm thời nếu cần xem chi tiết lỗi
+
+      # ---------- Trang quản trị ----------
+      # KHÔNG khai báo ADMIN_PASSWORD ở đây thì phân hệ quản trị TẮT HOÀN TOÀN
+      # (mọi đường dẫn /admin/ trả về 404). Muốn bật: vào Render Dashboard →
+      # Environment → Add Environment Variable → ADMIN_PASSWORD → đặt mật khẩu
+      # mạnh. Muốn tắt lại: xóa biến đó đi và Render tự triển khai lại.
+      #
+      # - key: ADMIN_PASSWORD
+      #   sync: false

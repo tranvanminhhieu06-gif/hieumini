@@ -1,0 +1,48 @@
+# ---------- Bí mật: TUYỆT ĐỐI không đưa lên Git ----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.txt
+tidb_password.txt
+
+# ---------- Tệp cấu hình cục bộ ----------
+.htpasswd
+config/local.php
+
+# ---------- Kết xuất & sao lưu cơ sở dữ liệu ----------
+*.sql.gz
+*.dump
+backup/
+dump/
+
+# ---------- Tệp do hệ điều hành sinh ra ----------
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+._*
+
+# ---------- Trình soạn thảo ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---------- Python (các script sinh dữ liệu, ảnh) ----------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# ---------- Nhật ký & tạm ----------
+*.log
+tmp/
+temp/
+error_log
+
+# ---------- Tệp người dùng tải lên khi chạy ----------
+projects/HieuWeb06/uploads/*
+!projects/HieuWeb06/uploads/.gitkeep
