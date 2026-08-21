@@ -65,8 +65,9 @@ echo.
 echo Dang nap du lieu... Qua trinh nay mat khoang 1-2 phut, vui long cho.
 echo.
 
+REM XAMPP dung MariaDB client: dung tham so --ssl (khong phai --ssl-mode)
 "%MYSQLEXE%" -h %TIDB_HOST% -P %TIDB_PORT% -u %TIDB_USER% -p"%TIDB_PASS%" ^
-    --ssl-mode=REQUIRED --default-character-set=utf8mb4 < "%SQLFILE%"
+    --ssl --default-character-set=utf8mb4 < "%SQLFILE%"
 
 if errorlevel 1 goto :fail
 
@@ -79,7 +80,7 @@ echo Dang kiem tra lai so bang trong tung co so du lieu...
 echo.
 
 "%MYSQLEXE%" -h %TIDB_HOST% -P %TIDB_PORT% -u %TIDB_USER% -p"%TIDB_PASS%" ^
-    --ssl-mode=REQUIRED --default-character-set=utf8mb4 --table -e ^
+    --ssl --default-character-set=utf8mb4 --table -e ^
     "SELECT table_schema AS 'Co so du lieu', COUNT(*) AS 'So bang' FROM information_schema.tables WHERE table_schema IN ('hieumini_portfolio','hieumini_db','hieumini_bookstore_db','hieumini_furniture_db','datcyber_appliances_db','hieumini_gym_db','hieumini_market_db') GROUP BY table_schema ORDER BY table_schema;"
 
 echo.
@@ -114,6 +115,11 @@ echo.
 echo   3. Tuong lua chan cong 4000
 echo      Thu tat tam thoi tuong lua hoac dung mang khac.
 echo      Hoac dung Cach A trong DEPLOY.md (dan SQL vao SQL Editor tren web).
+echo.
+echo   4. Loi "unknown option --ssl" hoac loi TLS:
+echo      Client MariaDB cu co the khong bat duoc TLS toi TiDB. Khi do
+echo      hay dung TiDB SQL Editor tren web: mo tep database\tidb_all.sql
+echo      bang Notepad, sao chep toan bo, dan vao SQL Editor va bam Run.
 echo.
 pause
 exit /b 1

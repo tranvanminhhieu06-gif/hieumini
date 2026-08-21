@@ -298,35 +298,55 @@
     var frames = Array.prototype.slice.call(document.querySelectorAll('[data-live-src]'));
     if (!frames.length) return;
 
-    // Dấu hiệu cho thấy dự án con đang báo lỗi kết nối cơ sở dữ liệu
-    var ERR_RE = /kết nối được cơ sở dữ liệu|cơ sở dữ liệu|SQLSTATE|Fatal error|Connection refused|database/i;
+    var ERR_RE = /kết nối được cơ sở dữ liệu|SQLSTATE|Fatal error|Connection refused|Uncaught PDOException|Unknown database/i;
 
     function inspect(wrap, iframe) {
-      // Cùng nguồn nên đọc được nội dung; nếu trang trống hoặc là trang lỗi
-      // CSDL thì hiện thẻ thông báo gọn thay cho khung trắng.
       try {
         var doc = iframe.contentDocument || iframe.contentWindow.document;
-        var text = (doc && doc.body ? doc.body.innerText : '').trim();
-        if (text.length < 12 || (text.length < 400 && ERR_RE.test(text))) {
+        if (!doc || !doc.body) return;
+
+        // Bỏ qua nếu iframe chưa tải xong URL thật (đang là about:blank)
+        var href = '';
+        try { href = doc.location ? doc.location.href : ''; } catch (e) {}
+        if (href === 'about:blank' || href === '') return;
+
+        var text = (doc.body.innerText || '').trim();
+        var html = doc.body.innerHTML || '';
+        var fb = wrap.querySelector('.frame-fallback');
+
+        // Chỉ coi là lỗi nếu có chuỗi lỗi CSDL/PHP hoặc nội dung body hoàn toàn rỗng
+        if ((text.length < 500 && ERR_RE.test(text)) || (text.length === 0 && html.length < 50)) {
           wrap.classList.add('is-fallback');
-          var fb = wrap.querySelector('.frame-fallback');
           if (fb) fb.hidden = false;
+        } else {
+          wrap.classList.remove('is-fallback');
+          if (fb) fb.hidden = true;
         }
       } catch (e) {
-        // Khác nguồn (hiếm khi xảy ra) → giữ nguyên khung
+        // Khác nguồn hoặc không truy cập được: giữ nguyên khung xem trực tiếp
+        wrap.classList.remove('is-fallback');
+        var fb_err = wrap.querySelector('.frame-fallback');
+        if (fb_err) fb_err.hidden = true;
       }
     }
 
     function load(wrap) {
       var iframe = wrap.querySelector('iframe');
       if (!iframe || iframe.src) return;
+
+      var targetSrc = wrap.getAttribute('data-live-src');
+      if (!targetSrc) return;
+
       iframe.addEventListener('load', function () {
         wrap.classList.add('is-ready');
-        inspect(wrap, iframe);
-      }, { once: true });
-      // Nếu dự án con không phản hồi trong 8 giây thì vẫn gỡ lớp chờ.
-      setTimeout(function () { wrap.classList.add('is-ready'); }, 8000);
-      iframe.src = wrap.getAttribute('data-live-src');
+        setTimeout(function () {
+          inspect(wrap, iframe);
+        }, 150);
+      });
+
+      // Gỡ lớp chờ sau tối đa 6 giây
+      setTimeout(function () { wrap.classList.add('is-ready'); }, 6000);
+      iframe.src = targetSrc;
     }
 
     if (!('IntersectionObserver' in window)) { frames.forEach(load); return; }
@@ -381,25 +401,48 @@
     var fallback = document.querySelector('[data-stage-fallback]');
     if (!iframe || !fallback) return;
 
-    var ERR_RE = /kết nối được cơ sở dữ liệu|SQLSTATE|Fatal error|Connection refused|Uncaught|Parse error/i;
+    var ERR_RE = /kết nối được cơ sở dữ liệu|SQLSTATE|Fatal error|Connection refused|Uncaught PDOException|Unknown database/i;
 
     function check() {
       try {
         var doc = iframe.contentDocument || iframe.contentWindow.document;
-        var text = (doc && doc.body ? doc.body.innerText : '').trim();
-        if (text.length < 12 || (text.length < 600 && ERR_RE.test(text))) {
+        if (!doc || !doc.body) return;
+
+        // Bỏ qua nếu iframe chưa nạp URL thật (đang là about:blank)
+        var href = '';
+        try { href = doc.location ? doc.location.href : ''; } catch (e) {}
+        if (href === 'about:blank' || href === '') return;
+
+        var text = (doc.body.innerText || '').trim();
+        var html = doc.body.innerHTML || '';
+
+        // Chỉ hiện cảnh báo khi có chuỗi lỗi CSDL/PHP hoặc thân trang hoàn toàn rỗng sau khi tải
+        if ((text.length < 500 && ERR_RE.test(text)) || (text.length === 0 && html.length < 50)) {
           fallback.hidden = false;
           iframe.style.visibility = 'hidden';
         } else {
           fallback.hidden = true;
           iframe.style.visibility = '';
         }
-      } catch (e) { /* khác nguồn: giữ nguyên */ }
+      } catch (e) {
+        // Khi khác nguồn hoặc không đọc được DOM con: mặc định giữ iframe hiển thị
+        fallback.hidden = true;
+        iframe.style.visibility = '';
+      }
     }
 
-    iframe.addEventListener('load', check);
-    // Kiểm tra lần đầu nếu iframe đã tải xong trước khi gắn sự kiện
-    if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') check();
+    iframe.addEventListener('load', function () {
+      setTimeout(check, 150);
+    });
+
+    try {
+      if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+        var curHref = iframe.contentDocument.location ? iframe.contentDocument.location.href : '';
+        if (curHref && curHref !== 'about:blank') {
+          setTimeout(check, 150);
+        }
+      }
+    } catch (e) {}
   }
 
   /* -----------------------------------------------------------------

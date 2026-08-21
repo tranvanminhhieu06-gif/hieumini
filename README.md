@@ -57,13 +57,16 @@ Mở **XAMPP Control Panel**, bấm **Start** ở hai dòng **Apache** và **MyS
 
 ### Bước 3 — Nạp cơ sở dữ liệu
 
-1. Mở <http://localhost/phpmyadmin>
-2. Chọn thẻ **Import** (Nhập)
-3. Bấm **Choose File**, chọn tệp `database/hieumini_portfolio.sql`
-4. Bấm **Go** (Thực hiện)
+Có 2 cách nạp dữ liệu:
 
-Script tự tạo CSDL `hieumini_portfolio`, 4 bảng và toàn bộ dữ liệu mẫu.
-Có thể chạy lại nhiều lần vì mỗi bảng đều có `DROP TABLE IF EXISTS`.
+- **Cách 1 (Nhanh nhất):** Chạy tệp `import-local.bat` ở thư mục gốc để nạp toàn bộ 7 CSDL (cổng chính + 6 website con).
+- **Cách 2 (phpMyAdmin):**
+  1. Mở <http://localhost/phpmyadmin>
+  2. Chọn thẻ **Import** (Nhập)
+  3. Bấm **Choose File**, chọn tệp `database/tidb_all.sql` (nạp toàn bộ 7 CSDL) hoặc `database/hieumini_portfolio.sql` (chỉ nạp cổng chính)
+  4. Bấm **Go** / **Import** (Thực hiện)
+
+Script tự động khởi tạo CSDL, các bảng và toàn bộ dữ liệu mẫu. Có thể chạy lại nhiều lần an toàn nhờ cơ chế `DROP TABLE IF EXISTS`.
 
 ### Bước 4 — Mở website
 
@@ -496,7 +499,7 @@ bằng nút "Tab mới" để kiểm chứng.
 |---|---|
 | Mở website | <http://localhost/HieuWebsite/> |
 | Xem một dự án | `project.php?slug=luxury-fitness` |
-| Nạp CSDL | phpMyAdmin → Import → `database/hieumini_portfolio.sql` |
+| Nạp CSDL | Chạy `import-local.bat` hoặc phpMyAdmin → Import → `database/tidb_all.sql` |
 | Bật admin (cmd) | `set ADMIN_PASSWORD=xxx` rồi `php -S localhost:8080` |
 | Bật admin (PowerShell) | `$env:ADMIN_PASSWORD="xxx"` rồi `php -S localhost:8080` |
 | Bật admin (Apache) | Thêm `SetEnv ADMIN_PASSWORD "xxx"` vào `.htaccess` |
