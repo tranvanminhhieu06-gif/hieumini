@@ -53,7 +53,8 @@ if (preg_match('#^(.*?/projects/[^/]+)#i', $scriptName, $matches)) {
     $cleanDir = preg_replace('#/(admin|api|includes)(/.*)?$#i', '', $scriptDir);
     $app_path = rtrim($cleanDir, '/');
 }
-if (!defined('BASE_URL')) define('BASE_URL', $protocol . $host . $app_path);
+if (!defined('BASE_URL')) define('BASE_URL', $app_path);
+if (!defined('BASE_URL_FULL')) define('BASE_URL_FULL', $protocol . $host . $app_path);
 
 // Kết nối Cơ sở dữ liệu bằng PDO
 try {

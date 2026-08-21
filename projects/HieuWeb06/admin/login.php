@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="container auth-wrap" style="min-height:100vh">
   <div class="glass auth-card">
     <a class="brand" href="<?= e(url('index.php')) ?>" style="margin-bottom:var(--sp-4)">
-      <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true">
+      <svg class="brand__mark" width="40" height="40" style="width:40px;height:40px;flex-shrink:0" viewBox="0 0 40 40" aria-hidden="true">
         <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7C3AED"/><stop offset="1" stop-color="#22D3EE"/></linearGradient></defs>
         <rect x="1.5" y="1.5" width="37" height="37" rx="11" fill="url(#lg)" opacity=".18"/>
         <rect x="1.5" y="1.5" width="37" height="37" rx="11" fill="none" stroke="url(#lg)" stroke-width="2"/>

@@ -23,7 +23,6 @@ define('SITE_NAME', 'HieuMini');
 define('SITE_SLOGAN', 'Chợ mã nguồn website chuẩn SEO cho người Việt');
 
 // ---------- 3. Đường dẫn gốc tự phát hiện ----------
-// Ví dụ: /DoAnWebsite/projects/HieuMini
 $__docRoot = str_replace('\\', '/', rtrim((string)($_SERVER['DOCUMENT_ROOT'] ?? ''), '/'));
 $__baseDir = str_replace('\\', '/', dirname(__DIR__));
 $__basePath = ($__docRoot !== '' && str_starts_with($__baseDir, $__docRoot))
@@ -31,8 +30,15 @@ $__basePath = ($__docRoot !== '' && str_starts_with($__baseDir, $__docRoot))
     : '';
 define('BASE_PATH', rtrim($__basePath, '/'));
 
-$__scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-define('BASE_URL', $__scheme . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . BASE_PATH);
+$__isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
+    || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower((string)$_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+    || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on');
+$__scheme = $__isHttps ? 'https' : 'http';
+
+// Đường dẫn tương đối gốc (root-relative) để tránh lỗi Mixed Content khi chạy sau HTTPS Proxy như Render/Cloudflare
+define('BASE_URL', BASE_PATH);
+define('BASE_URL_FULL', $__scheme . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . BASE_PATH);
 
 define('ROOT_DIR', dirname(__DIR__));
 define('UPLOAD_DIR', ROOT_DIR . '/uploads');
