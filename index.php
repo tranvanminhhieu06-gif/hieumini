@@ -181,11 +181,6 @@ $heroGradientFrom = 5; // Từ "khám" trở đi tô màu gradient
                 <span class="frame-spinner"></span>
                 Đang nạp <?= e($p['code']) ?>…
               </div>
-              <div class="frame-fallback" hidden>
-                <?= icon('database', 'ico') ?>
-                <b><?= e($p['name']) ?></b>
-                <span>Bản xem trước cần nạp cơ sở dữ liệu <code><?= e($p['db_name']) ?></code></span>
-              </div>
             <?php else: ?>
               <div class="frame-skeleton" style="opacity:1">
                 Không tìm thấy thư mục projects/<?= e($p['folder']) ?>

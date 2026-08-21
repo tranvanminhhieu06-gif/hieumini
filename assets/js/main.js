@@ -290,70 +290,45 @@
   }
 
   /* -----------------------------------------------------------------
-   | 9. NẠP KHUNG XEM TRỰC TIẾP THEO NHU CẦU (lazy iframe)
-   |    Chỉ nạp khi thẻ dự án sắp lọt vào khung nhìn, tránh 6 iframe
-   |    cùng tải một lúc làm chậm trang chủ.
+   | 9. NẠP KHUNG XEM TRỰC TIẾP (live preview iframe)
+   |    Hiển thị trực tiếp giao diện website con, không kiểm tra DOM
+   |    vì có thể sai sót dẫn đến che khuất bản xem trước thật.
    * ----------------------------------------------------------------- */
   function initLiveFrames() {
-    var frames = Array.prototype.slice.call(document.querySelectorAll('.live-frame[data-live-src]'));
+    var frames = Array.prototype.slice.call(document.querySelectorAll('.live-frame'));
     if (!frames.length) return;
-
-    var ERR_RE = /SQLSTATE\[|Fatal error:|Uncaught PDOException|Unknown database 'hieu/i;
-
-    function inspect(wrap, iframe) {
-      try {
-        var doc = iframe.contentDocument || iframe.contentWindow.document;
-        if (!doc || !doc.body) return;
-
-        // Bỏ qua nếu iframe chưa tải xong URL thật (đang là about:blank)
-        var href = '';
-        try { href = doc.location ? doc.location.href : ''; } catch (e) {}
-        if (href === 'about:blank' || href === '') return;
-
-        var text = (doc.body.innerText || '').trim();
-        var fb = wrap.querySelector('.frame-fallback');
-
-        // Chỉ coi là lỗi nếu xuất hiện chuỗi lỗi SQL/PHP chết người
-        if (text.length < 400 && ERR_RE.test(text)) {
-          wrap.classList.add('is-fallback');
-          if (fb) fb.hidden = false;
-        } else {
-          wrap.classList.remove('is-fallback');
-          if (fb) fb.hidden = true;
-        }
-      } catch (e) {
-        // Khác nguồn hoặc không truy cập được: luôn giữ nguyên khung live
-        wrap.classList.remove('is-fallback');
-        var fb_err = wrap.querySelector('.frame-fallback');
-        if (fb_err) fb_err.hidden = true;
-      }
-    }
 
     frames.forEach(function (wrap) {
       var iframe = wrap.querySelector('iframe');
       if (!iframe) return;
 
+      // Nếu iframe chưa có src (từ data-live-src) thì gán vào
       var targetSrc = wrap.getAttribute('data-live-src');
-      if (targetSrc && !iframe.src) {
+      if (targetSrc && !iframe.getAttribute('src')) {
         iframe.src = targetSrc;
       }
 
-      function onReady() {
+      // Khi iframe tải xong: ẩn spinner ngay lập tức
+      iframe.addEventListener('load', function () {
         wrap.classList.add('is-ready');
-        setTimeout(function () {
-          inspect(wrap, iframe);
-        }, 200);
+        // Đảm bảo fallback bị ẩn - luôn hiện website thật
+        var fb = wrap.querySelector('.frame-fallback');
+        if (fb) fb.hidden = true;
+        wrap.classList.remove('is-fallback');
+      });
+
+      // Nếu iframe đã tải xong (cache): gỡ spinner luôn
+      if (iframe.src && iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+        wrap.classList.add('is-ready');
       }
 
-      iframe.addEventListener('load', onReady);
-      if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete' && iframe.src) {
-        onReady();
-      }
-
-      // Đảm bảo gỡ spinner sau tối đa 3.5 giây để luôn hiện website live
+      // Luôn gỡ spinner sau tối đa 4 giây dù tải chậm
       setTimeout(function () {
         wrap.classList.add('is-ready');
-      }, 3500);
+        var fb = wrap.querySelector('.frame-fallback');
+        if (fb) fb.hidden = true;
+        wrap.classList.remove('is-fallback');
+      }, 4000);
     });
   }
 
