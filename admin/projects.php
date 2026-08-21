@@ -57,7 +57,7 @@ admin_head('Quản lý dự án');
       <thead>
         <tr>
           <th>Mã</th><th>Tên dự án</th><th>Lĩnh vực</th><th>Thư mục</th>
-          <th style="text-align:right">Lượt xem</th><th>Trạng thái</th><th style="text-align:right">Thao tác</th>
+          <th style="text-align:right">Lượt xem</th><th style="text-align:right">Đã bán</th><th>Trạng thái</th><th style="text-align:right">Thao tác</th>
         </tr>
       </thead>
       <tbody>
@@ -76,6 +76,7 @@ admin_head('Quản lý dự án');
             <?php endif; ?>
           </td>
           <td style="text-align:right;font-weight:600"><?= num($p['views']) ?></td>
+          <td style="text-align:right;font-weight:700;color:var(--emerald-500,#10b981)"><?= num($p['sold'] ?? 0) ?></td>
           <td>
             <span class="badge <?= $p['status'] === 'published' ? 'badge--ok' : 'badge--muted' ?>">
               <?= $p['status'] === 'published' ? 'Hiển thị' : ($p['status'] === 'draft' ? 'Nháp' : 'Lưu trữ') ?>

@@ -42,6 +42,7 @@ CREATE TABLE `projects` (
   `status`        ENUM('draft','published','archived') NOT NULL DEFAULT 'published',
   `sort_order`    SMALLINT     NOT NULL DEFAULT 0,
   `views`         INT UNSIGNED NOT NULL DEFAULT 0,
+  `sold`          INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Số lượng đã bán / đăng ký',
   `created_at`    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at`    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -185,6 +186,14 @@ LIMIT 400;
 
 UPDATE `projects` p
 SET p.`views` = (SELECT COUNT(*) FROM `visit_logs` v WHERE v.`project_id` = p.`id`);
+
+-- Số lượng đã bán (dữ liệu mẫu, quản trị viên có thể sửa trong trang Quản lý dự án)
+UPDATE `projects` SET `sold` = 1284 WHERE `code` = 'HieuWeb01';
+UPDATE `projects` SET `sold` = 947  WHERE `code` = 'HieuWeb02';
+UPDATE `projects` SET `sold` = 2156 WHERE `code` = 'HieuWeb03';
+UPDATE `projects` SET `sold` = 763  WHERE `code` = 'HieuWeb04';
+UPDATE `projects` SET `sold` = 421  WHERE `code` = 'HieuWeb05';
+UPDATE `projects` SET `sold` = 1539 WHERE `code` = 'HieuWeb06';
 
 INSERT INTO `messages` (`name`,`email`,`subject`,`content`,`ip`,`is_read`) VALUES
 ('Nguyễn Thị Lan','lan.nguyen@example.com','Hỏi về dự án Fashion Studio','Chào bạn, mình muốn tham khảo mã nguồn phần bộ lọc size của dự án HieuWeb01. Bạn có thể chia sẻ thêm không?','127.0.0.1',0),

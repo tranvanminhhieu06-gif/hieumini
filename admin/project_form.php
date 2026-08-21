@@ -15,7 +15,7 @@ $blank = [
     'category' => '', 'tech_stack' => '', 'folder' => '', 'entry_file' => 'index.php',
     'admin_path' => 'admin/', 'db_name' => '', 'accent_from' => '#4F46E5', 'accent_to' => '#7C3AED',
     'year' => (int) date('Y'), 'table_count' => 0, 'page_count' => 0,
-    'status' => 'published', 'sort_order' => 0,
+    'status' => 'published', 'sort_order' => 0, 'sold' => 0,
 ];
 
 $data = $blank;
@@ -67,7 +67,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!$errors) {
-        $columns = array_keys($blank);
+        /* Chỉ ghi những cột thực sự tồn tại trong bảng — an toàn nếu chưa chạy
+           migration thêm cột "sold" (đã bán). */
+        $tableCols = array_column(Database::all('SHOW COLUMNS FROM projects'), 'Field');
+        $columns = array_values(array_intersect(array_keys($blank), $tableCols));
 
         if ($isEdit) {
             $set = implode(', ', array_map(static fn ($c) => "$c = ?", $columns));
@@ -171,7 +174,12 @@ function field(string $name, string $label, array $data, array $errors, array $o
         field('page_count',  'Số trang',   $data, $errors, ['type' => 'number']);
         ?>
       </div>
-      <?php field('sort_order', 'Thứ tự hiển thị', $data, $errors, ['type' => 'number', 'hint' => 'Số nhỏ hiển thị trước.']); ?>
+      <div class="grid-2">
+        <?php
+        field('sort_order', 'Thứ tự hiển thị', $data, $errors, ['type' => 'number', 'hint' => 'Số nhỏ hiển thị trước.']);
+        field('sold', 'Đã bán', $data, $errors, ['type' => 'number', 'hint' => 'Số lượt bán/đăng ký hiển thị trên thẻ dự án.']);
+        ?>
+      </div>
     </section>
   </div>
 
