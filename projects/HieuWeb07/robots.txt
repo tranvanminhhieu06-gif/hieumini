@@ -1,0 +1,15 @@
+# HieuMini Books — hướng dẫn cho robot của công cụ tìm kiếm
+
+User-agent: *
+Allow: /
+
+# Không lập chỉ mục khu vực quản trị và điểm cuối API nội bộ
+Disallow: /admin/
+Disallow: /api/
+
+# Không lập chỉ mục các trang kết quả lọc/sắp xếp: nội dung trùng với
+# trang kho sách chính, để bot đọc hết chỉ làm loãng thứ hạng.
+Disallow: /*?*sap-xep=
+Disallow: /*?*trang=
+
+Sitemap: /sitemap.xml
