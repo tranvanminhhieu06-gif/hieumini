@@ -227,8 +227,11 @@ INSERT INTO `reviews` (`book_id`,`reader_name`,`rating`,`content`,`is_approved`)
 ((SELECT id FROM books WHERE slug='kinh-van-hoa'),'Gia Huy',4,'Đọc xong thấy suy nghĩ khác đi khá nhiều về chuyện cũ.',1);
 
 INSERT INTO `admins` (`username`,`password_hash`,`full_name`) VALUES
-('admin','$2y$10$fUFFXf/TqekJNEghad3NDunVMawk47OF93fIgiUoemGylwXCGJaiu','Trần Văn Minh Hiếu');
--- Mật khẩu mặc định: hieumini2026 — ĐỔI NGAY sau khi cài đặt xong.
+('admin','$2y$10$fUFFXf/TqekJNEghad3NDunVMawk47OF93fIgiUoemGylwXCGJaiu','Trần Văn Minh Hiếu'),
+('admin@hieumini.vn','$2y$10$aPz8E7Db655Q.Knl94pkbu4MPbMhUfv4wP0JPmA8hSn0XQtBFHyB.','Tài khoản demo');
+-- admin / hieumini2026            — tài khoản chính, ĐỔI NGAY sau khi cài đặt.
+-- admin@hieumini.vn / demo123     — tài khoản demo dùng chung cho cả 7 dự án,
+--                                   khớp với thông tin hiển thị trên cổng HieuMini.
 
 INSERT INTO `messages` (`name`,`email`,`subject`,`content`,`is_read`) VALUES
 ('Ngọc Anh','ngocanh@example.com','Hỏi về bản in mới','Cho mình hỏi cuốn Chí Phèo có bản bìa cứng không ạ?',0),

@@ -67,11 +67,28 @@ chọn tệp `database/hieumini_books_db.sql` → **Go**.
 > 30 sách, 20 tác giả, 66 đánh giá mẫu. Chạy lại tệp này sẽ **xoá và tạo mới**
 > toàn bộ — tiện khi muốn về trạng thái ban đầu.
 
-### Bước 4 — Mở website
+### Bước 4 — Đăng ký dự án lên cổng HieuMini
+
+Để dự án xuất hiện thành thẻ thứ 7 ở trang chính (kèm khung xem trước chạy trực tiếp),
+chạy thêm tệp SQL đăng ký dự án vào cơ sở dữ liệu của cổng:
+
+```bash
+mysql -u root < "C:\xampp\htdocs\HieuWebsite\database\them_hieuweb07.sql"
+```
+
+Tệp này ghi một dòng vào bảng `projects` và 6 dòng điểm nổi bật vào `project_features`
+của `hieumini_portfolio`, đồng thời bổ sung tài khoản demo dùng chung cho cả bảy dự án.
+Chạy lại nhiều lần cũng không sinh dữ liệu trùng.
+
+Bỏ qua bước này thì website vẫn chạy độc lập bình thường, chỉ là không hiện trên trang chính.
+
+### Bước 5 — Mở website
 
 <http://localhost/HieuWebsite/projects/HieuWeb07/>
 
-### Bước 5 (nếu cần) — Đổi thông tin kết nối
+Từ trang chính: <http://localhost/HieuWebsite/> → cuộn tới thẻ **HieuMini Books**.
+
+### Bước 6 (nếu cần) — Đổi thông tin kết nối
 
 Sửa 4 hằng số đầu tệp `config/config.php`:
 
@@ -86,11 +103,12 @@ const DB_PASS = '';        // XAMPP mặc định để trống
 
 ## 3. Đăng nhập quản trị
 
-| | |
-|---|---|
-| Địa chỉ | `/admin/login.php` |
-| Tên đăng nhập | `admin` |
-| Mật khẩu | `hieumini2026` |
+| Tài khoản | Mật khẩu | Ghi chú |
+|---|---|---|
+| `admin` | `hieumini2026` | Tài khoản chính |
+| `admin@hieumini.vn` | `demo123` | Tài khoản demo dùng chung cho cả 7 dự án, khớp với thông tin hiển thị trên cổng HieuMini |
+
+Địa chỉ đăng nhập: `/admin/login.php`
 
 **Đổi mật khẩu ngay sau khi cài xong.** Sinh chuỗi băm mới rồi cập nhật vào bảng `admins`:
 

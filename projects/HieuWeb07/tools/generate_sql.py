@@ -21,6 +21,11 @@ OUT = os.path.join(ROOT, "database", "hieumini_books_db.sql")
 # Băm bcrypt của mật khẩu "hieumini2026" — PHP password_verify() đọc được.
 ADMIN_HASH = "$2y$10$fUFFXf/TqekJNEghad3NDunVMawk47OF93fIgiUoemGylwXCGJaiu"
 
+# Tài khoản demo dùng chung cho cả bảy dự án con, đúng như thông tin mà cổng
+# trưng bày HieuMini hiển thị ở trang chi tiết dự án. Thiếu tài khoản này thì
+# người xem bấm "Trang quản trị dự án" từ trang chính sẽ không đăng nhập được.
+DEMO_HASH = "$2y$10$aPz8E7Db655Q.Knl94pkbu4MPbMhUfv4wP0JPmA8hSn0XQtBFHyB."
+
 REVIEWERS = ["Minh Thư", "Quốc Bảo", "Hà Linh", "Đăng Khoa", "Thu Trang", "Gia Huy",
              "Phương Nhi", "Tuấn Kiệt", "Bảo Ngọc", "Hoàng Long", "Mai Anh", "Đức Thắng"]
 
@@ -193,8 +198,11 @@ def main():
     add("")
 
     add("INSERT INTO `admins` (`username`,`password_hash`,`full_name`) VALUES")
-    add(f"('admin',{esc(ADMIN_HASH)},'Trần Văn Minh Hiếu');")
-    add("-- Mật khẩu mặc định: hieumini2026 — ĐỔI NGAY sau khi cài đặt xong.")
+    add(f"('admin',{esc(ADMIN_HASH)},'Trần Văn Minh Hiếu'),")
+    add(f"('admin@hieumini.vn',{esc(DEMO_HASH)},'Tài khoản demo');")
+    add("-- admin / hieumini2026            — tài khoản chính, ĐỔI NGAY sau khi cài đặt.")
+    add("-- admin@hieumini.vn / demo123     — tài khoản demo dùng chung cho cả 7 dự án,")
+    add("--                                   khớp với thông tin hiển thị trên cổng HieuMini.")
     add("")
 
     add("INSERT INTO `messages` (`name`,`email`,`subject`,`content`,`is_read`) VALUES")
