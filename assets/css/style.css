@@ -634,6 +634,15 @@ button { cursor: pointer; }
 .footer-bottom { display: flex; flex-wrap: wrap; gap: var(--space-3); justify-content: space-between; padding-top: var(--space-5); border-top: 1px solid var(--border); font-size: var(--fs-sm); color: var(--fg-subtle); }
 
 /* ---------- 11. HOẠT ẢNH CUỘN ---------------------------------------- */
+
+/* Lenis (cuộn mượt). Lấy từ lenis.css nhưng CỐ Ý bỏ quy tắc
+   `.lenis.lenis-smooth iframe { pointer-events: none }` của thư viện:
+   trang này sống nhờ các iframe chạy thật, tắt con trỏ trên iframe là
+   người xem hết bấm được vào website con. */
+html.lenis, html.lenis body { height: auto; }
+.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
+.lenis [data-lenis-prevent] { overscroll-behavior: contain; }
+
 [data-reveal] { opacity: 0; transform: translateY(28px); }
 [data-reveal].is-visible {
   opacity: 1; transform: none;

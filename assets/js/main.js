@@ -1,12 +1,21 @@
 /* =====================================================================
    HieuMini — Lớp tương tác & hoạt ảnh
-   Không phụ thuộc thư viện ngoài: chạy được cả khi máy không có Internet.
+   Thư viện ngoài (GSAP, ScrollTrigger, Lenis) nằm trong assets/vendor/ và
+   được nạp kèm, nên trang vẫn chạy khi máy không có Internet. Nếu thiếu
+   file nào thì phần hiệu ứng đó tự quay về cách viết tay cũ — trang không vỡ.
    Mọi hiệu ứng đều bị vô hiệu hóa khi người dùng bật "giảm chuyển động".
    ===================================================================== */
 (function () {
   'use strict';
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Dò thư viện một lần, dùng lại ở nhiều nơi bên dưới. */
+  var hasGSAP  = !!(window.gsap && window.ScrollTrigger);
+  var hasLenis = !!window.Lenis;
+  var lenis    = null;
+
+  if (hasGSAP) window.gsap.registerPlugin(window.ScrollTrigger);
 
   /* -----------------------------------------------------------------
    | 1. CHẾ ĐỘ SÁNG / TỐI
@@ -129,6 +138,31 @@
     if (!hero || reduceMotion || window.matchMedia('(hover: none)').matches) return;
 
     var layers = Array.prototype.slice.call(hero.querySelectorAll('[data-depth]'));
+    if (!layers.length) return;
+
+    /* gsap.quickTo dựng sẵn hàm setter đã nội suy — đúng việc mà vòng lặp
+       lerp thủ công bên dưới đang làm, nhưng mượt hơn và không tự quản rAF. */
+    if (hasGSAP) {
+      var movers = layers.map(function (el) {
+        return {
+          depth: parseFloat(el.getAttribute('data-depth')) || 10,
+          toX: window.gsap.quickTo(el, 'x', { duration: 0.7, ease: 'power3.out' }),
+          toY: window.gsap.quickTo(el, 'y', { duration: 0.7, ease: 'power3.out' })
+        };
+      });
+
+      hero.addEventListener('pointermove', function (ev) {
+        var rect = hero.getBoundingClientRect();
+        var px = (ev.clientX - rect.left) / rect.width - 0.5;
+        var py = (ev.clientY - rect.top) / rect.height - 0.5;
+        movers.forEach(function (m) { m.toX(-px * m.depth); m.toY(-py * m.depth); });
+      });
+      hero.addEventListener('pointerleave', function () {
+        movers.forEach(function (m) { m.toX(0); m.toY(0); });
+      });
+      return;
+    }
+
     var tx = 0, ty = 0, cx = 0, cy = 0, raf = null;
 
     hero.addEventListener('pointermove', function (ev) {
@@ -157,8 +191,36 @@
     var items = document.querySelectorAll('[data-reveal]');
     if (!items.length) return;
 
-    if (reduceMotion || !('IntersectionObserver' in window)) {
+    if (reduceMotion || (!hasGSAP && !('IntersectionObserver' in window))) {
       items.forEach(function (el) { el.classList.add('is-visible'); });
+      return;
+    }
+
+    /* ScrollTrigger.batch gom các phần tử cùng lọt vào khung nhìn trong một
+       khung hình rồi chạy chung một stagger — nhờ vậy độ trễ nối tiếp bám theo
+       thứ tự người dùng thực sự nhìn thấy, thay vì thứ tự cứng trong DOM. */
+    if (hasGSAP) {
+      window.ScrollTrigger.batch(items, {
+        start: 'top 88%',
+        once: true,
+        onEnter: function (batch) {
+          window.gsap.to(batch, {
+            opacity: 1,
+            y: 0,
+            duration: 0.68,
+            ease: 'power3.out',
+            stagger: 0.07,
+            overwrite: true,
+            onComplete: function () {
+              // Trả phần tử về trạng thái CSS chuẩn để các hiệu ứng hover sau này không vướng style nội tuyến.
+              batch.forEach(function (el) {
+                el.classList.add('is-visible');
+                window.gsap.set(el, { clearProps: 'opacity,transform' });
+              });
+            }
+          });
+        }
+      });
       return;
     }
 
@@ -213,6 +275,59 @@
   }
 
   /* -----------------------------------------------------------------
+   | 5b. CUỘN MƯỢT TOÀN TRANG (Lenis)
+   |
+   | Lenis bọc lại thao tác cuộn của trình duyệt chứ không thay thế nó, nên
+   | thanh cuộn, phím Home/End và liên kết neo vẫn hoạt động bình thường.
+   | Phải chạy trước initScrollUI vì hàm đó dựa vào biến `lenis`.
+   * ----------------------------------------------------------------- */
+  function initSmoothScroll() {
+    if (!hasLenis || reduceMotion) return;
+
+    lenis = new window.Lenis({
+      duration: 1.05,
+      easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
+      smoothWheel: true
+    });
+
+    if (hasGSAP) {
+      /* Dồn Lenis và GSAP về chung một vòng lặp khung hình: hai bộ đếm thời
+         gian chạy song song sẽ khiến hoạt ảnh theo cuộn bị giật nhẹ. */
+      lenis.on('scroll', window.ScrollTrigger.update);
+      window.gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
+      window.gsap.ticker.lagSmoothing(0);
+    } else {
+      requestAnimationFrame(function loop(time) {
+        lenis.raf(time);
+        requestAnimationFrame(loop);
+      });
+    }
+
+    /* Liên kết neo trong cùng trang (ví dụ "Dự án" → #projects) cần đi qua
+       Lenis, nếu không trình duyệt sẽ nhảy phắt tới nơi và phá mạch cuộn. */
+    document.addEventListener('click', function (ev) {
+      var a = ev.target.closest('a[href*="#"]');
+      if (!a || a.target === '_blank') return;
+
+      var href = a.getAttribute('href') || '';
+      var hash = href.indexOf('#') >= 0 ? href.slice(href.indexOf('#')) : '';
+      if (hash.length < 2) return;
+
+      // Chỉ xử lý khi liên kết trỏ về đúng trang đang xem.
+      var samePage = href.charAt(0) === '#' ||
+        (a.pathname === window.location.pathname && a.host === window.location.host);
+      if (!samePage) return;
+
+      var target = document.querySelector(hash);
+      if (!target) return;
+
+      ev.preventDefault();
+      lenis.scrollTo(target, { offset: -80 });
+      history.pushState(null, '', hash);
+    });
+  }
+
+  /* -----------------------------------------------------------------
    | 6. THANH TIẾN ĐỘ CUỘN + HEADER DÍNH + NÚT LÊN ĐẦU
    * ----------------------------------------------------------------- */
   function initScrollUI() {
@@ -221,23 +336,33 @@
     var toTop = document.querySelector('.to-top');
     var ticking = false;
 
-    function update() {
-      var y = window.scrollY;
-      var max = document.documentElement.scrollHeight - window.innerHeight;
-      if (bar) bar.style.transform = 'scaleX(' + (max > 0 ? y / max : 0) + ')';
+    function paint(y, progress) {
+      if (bar) bar.style.transform = 'scaleX(' + progress + ')';
       if (header) header.classList.toggle('is-stuck', y > 8);
       if (toTop) toTop.classList.toggle('is-shown', y > 700);
       ticking = false;
     }
 
-    window.addEventListener('scroll', function () {
-      if (!ticking) { ticking = true; requestAnimationFrame(update); }
-    }, { passive: true });
+    function update() {
+      var y = window.scrollY;
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      paint(y, max > 0 ? y / max : 0);
+    }
+
+    if (lenis) {
+      // Lenis đã tính sẵn tiến trình cuộn, khỏi đo lại chiều cao tài liệu mỗi khung hình.
+      lenis.on('scroll', function (e) { paint(e.scroll, e.progress || 0); });
+    } else {
+      window.addEventListener('scroll', function () {
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+      }, { passive: true });
+    }
     update();
 
     if (toTop) {
       toTop.addEventListener('click', function () {
-        window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+        if (lenis) lenis.scrollTo(0);
+        else window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
       });
     }
   }
@@ -411,6 +536,9 @@
       var href = a.getAttribute('href') || '';
       if (!href || href.charAt(0) === '#' || /^(mailto:|tel:|javascript:)/i.test(href)) return;
       if (a.origin !== window.location.origin) return;
+      // Neo trong cùng một trang (index.php#projects khi đang ở index.php) do
+      // phần cuộn mượt lo, không được coi là chuyển trang kẻo bị tải lại.
+      if (a.hash && a.pathname === window.location.pathname) return;
 
       ev.preventDefault();
       document.body.classList.add('is-leaving');
@@ -476,6 +604,7 @@
     initParallax();
     initReveal();
     initCounters();
+    initSmoothScroll();
     initScrollUI();
     initNav();
     initRipple();
