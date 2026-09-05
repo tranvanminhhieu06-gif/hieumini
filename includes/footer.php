@@ -47,6 +47,7 @@
          defer giữ đúng thứ tự thực thi: GSAP → ScrollTrigger → Lenis → main.js */ ?>
 <script src="<?= e(asset('vendor/gsap.min.js')) ?>" defer></script>
 <script src="<?= e(asset('vendor/ScrollTrigger.min.js')) ?>" defer></script>
+<script src="<?= e(asset('vendor/SplitText.min.js')) ?>" defer></script>
 <script src="<?= e(asset('vendor/lenis.min.js')) ?>" defer></script>
 <script src="<?= e(asset('js/main.js')) ?>?v=<?= filemtime(__DIR__ . '/../assets/js/main.js') ?: '2' ?>" defer></script>
 </body>

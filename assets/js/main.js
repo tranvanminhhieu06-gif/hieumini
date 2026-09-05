@@ -275,6 +275,69 @@
   }
 
   /* -----------------------------------------------------------------
+   | 4b. TÁCH CHỮ CHO TIÊU ĐỀ (GSAP SplitText)
+   |
+   | Chỉ nhận .hero h1 và các phần tử tự đánh dấu data-split. Cố ý KHÔNG quét
+   | mọi h2: các tiêu đề mục đã nằm trong khối [data-reveal] và đang được cha
+   | nó làm hiệu ứng rồi — tách thêm sẽ thành hai hoạt ảnh chạy chồng nhau.
+   | Muốn thêm tiêu đề nào thì gắn data-split cho tiêu đề đó.
+   |
+   | Tách theo TỪ chứ không theo ký tự: chữ gradient dùng background-clip:text,
+   | chẻ nhỏ tới từng ký tự sẽ khiến mỗi chữ cái mang một dải màu riêng và
+   | phần chữ trong suốt biến mất.
+   * ----------------------------------------------------------------- */
+  function initSplitHeadings() {
+    if (reduceMotion || !hasGSAP || !window.SplitText) return;
+
+    var targets = document.querySelectorAll('.hero h1, [data-split]');
+    if (!targets.length) return;
+
+    window.gsap.registerPlugin(window.SplitText);
+
+    /* Chờ font hiển thị xong mới đo dòng: tách trước lúc font tải xong thì
+       vị trí ngắt dòng tính theo font dự phòng và sẽ lệch khi font thật vào. */
+    var ready = document.fonts && document.fonts.ready
+      ? document.fonts.ready
+      : Promise.resolve();
+
+    ready.then(function () {
+      Array.prototype.forEach.call(targets, function (el) {
+        // Bản PHP đã dựng sẵn hoạt ảnh CSS cho từng từ (dùng khi không có JS).
+        // Khi GSAP tiếp quản thì tắt đi để hai bên không chạy chồng lên nhau.
+        el.querySelectorAll('.reveal-word').forEach(function (w) {
+          w.style.animation = 'none';
+          w.style.opacity = '1';
+          w.style.transform = 'none';
+        });
+
+        var inHero = !!el.closest('.hero');
+
+        window.SplitText.create(el, {
+          type: 'words,lines',
+          mask: 'lines',      // bọc mỗi dòng trong khung cắt để chữ trồi lên từ dưới
+          autoSplit: true,    // đổi cỡ màn hình → tự tách lại theo dòng mới
+          aria: 'auto',       // giữ nguyên câu gốc cho trình đọc màn hình
+          onSplit: function (self) {
+            return window.gsap.from(self.words, {
+              yPercent: 118,
+              opacity: 0,
+              duration: 0.85,
+              ease: 'power4.out',
+              stagger: 0.035,
+              // Tiêu đề banner chạy ngay khi vào trang; tiêu đề khác đợi cuộn tới.
+              scrollTrigger: inHero ? undefined : {
+                trigger: el,
+                start: 'top 85%',
+                once: true
+              }
+            });
+          }
+        });
+      });
+    });
+  }
+
+  /* -----------------------------------------------------------------
    | 5b. CUỘN MƯỢT TOÀN TRANG (Lenis)
    |
    | Lenis bọc lại thao tác cuộn của trình duyệt chứ không thay thế nó, nên
@@ -603,6 +666,7 @@
     initMorph();
     initParallax();
     initReveal();
+    initSplitHeadings();
     initCounters();
     initSmoothScroll();
     initScrollUI();

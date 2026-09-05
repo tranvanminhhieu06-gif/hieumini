@@ -193,6 +193,13 @@ button { cursor: pointer; }
   background: linear-gradient(100deg, #A5B4FC, #C4B5FD 45%, #67E8F9);
   -webkit-background-clip: text; background-clip: text;
 }
+/* SplitText bọc chữ vào một thẻ con để chạy hoạt ảnh. Thẻ con đó thừa kế
+   text-fill-color trong suốt nhưng KHÔNG thừa kế nền, nên nếu không chuyền
+   gradient xuống thì chữ sẽ trong suốt trên nền trống — tức là mất hút. */
+.gradient-text > * {
+  background: inherit;
+  -webkit-background-clip: text; background-clip: text;
+}
 
 /* ---------- 4. NÚT --------------------------------------------------- */
 .btn {
